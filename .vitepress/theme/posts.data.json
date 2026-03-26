@@ -1,5 +1,23 @@
 [
   {
+    "slug": "quickly-parsing-unicode-escapes-with-swar",
+    "title": "Quickly parsing Unicode Escapes with SWAR",
+    "description": "Parsing JSON unicode escape sequences with SWAR instead of branches or lookup tables.",
+    "date": "March 26, 2026",
+    "category": "Performance",
+    "banner": "/images/unicode-escapes-swar-banner.jpg",
+    "bannerAlt": "Abstract banner image for unicode parsing post",
+    "socialImage": "/social/quickly-parsing-unicode-escapes-with-swar.png",
+    "tags": [
+      "performance",
+      "swar",
+      "assemblyscript"
+    ],
+    "commentCount": 0,
+    "reactionCount": 1,
+    "mtimeMs": 1774508249266.4277
+  },
+  {
     "slug": "fuzzing-in-assemblyscript",
     "title": "Fuzzing in AssemblyScript",
     "description": "How to add practical property-based fuzzing to an AssemblyScript project with as-test.",
@@ -16,24 +34,6 @@
     ],
     "commentCount": 0,
     "reactionCount": 0,
-    "mtimeMs": 1774507270964.7483
-  },
-  {
-    "slug": "quickly-parsing-unicode-escapes-with-swar",
-    "title": "Quickly parsing Unicode Escapes with SWAR",
-    "description": "Parsing JSON unicode escape sequences with SWAR instead of branches or lookup tables.",
-    "date": "March 26, 2026",
-    "category": "Performance",
-    "banner": "/images/unicode-escapes-swar-banner.jpg",
-    "bannerAlt": "Abstract banner image for unicode parsing post",
-    "socialImage": "/social/quickly-parsing-unicode-escapes-with-swar.png",
-    "tags": [
-      "performance",
-      "swar",
-      "assemblyscript"
-    ],
-    "commentCount": 0,
-    "reactionCount": 1,
-    "mtimeMs": 1774507270964.7483
+    "mtimeMs": 1774508249265.4277
   }
 ]

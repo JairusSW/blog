@@ -205,38 +205,55 @@ function getImageDataUri(input) {
 }
 
 
+function renderTagPills(tags, baseHue, startX, y) {
+  let offsetX = startX;
+  return tags.slice(0, 4).map((tag, index) => {
+    const width = Math.max(92, 32 + tag.length * 13);
+    const x = offsetX;
+    offsetX += width + 14;
+    const hue = (baseHue + index * 28) % 360;
+    return `
+      <rect x="${x}" y="${y}" width="${width}" height="42" rx="21" fill="hsla(${hue}, 80%, 55%, 0.14)" stroke="hsla(${hue}, 90%, 68%, 0.38)"/>
+      <text x="${x + 18}" y="${y + 28}" fill="#e2e8f0" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">${escapeXml(tag)}</text>
+    `;
+  }).join("");
+}
+
+function formatCountLabel(count, noun) {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
+
 function renderCard({
   title,
   description,
+  tags = [],
   eyebrow = "Jairus' Blog",
   banner = "",
   date = "",
   category = "",
+  reactionCount = 0,
+  commentCount = 0,
 }, outputName) {
   const hue = colorFromString(`${title}${category}${description}`);
-  const titleLines = wrapLines(title, 28).slice(0, 3);
-  const descLines = wrapLines(description, 60).slice(0, 3);
+  const titleLines = wrapLines(title, 24).slice(0, 3);
+  const descLines = wrapLines(description, 54).slice(0, 3);
   const bannerImage = getImageDataUri(banner);
-  const cardX = 120;
-  const cardY = 48;
-  const cardWidth = 960;
-  const cardHeight = 534;
-  const bannerHeight = 214;
+  const cardX = 0;
+  const cardY = 0;
+  const cardWidth = 1200;
+  const cardHeight = 630;
+  const bannerHeight = 252;
   const bodyX = cardX + 44;
-  const bodyY = cardY + bannerHeight + 46;
+  const bodyY = cardY + bannerHeight + 38;
   const meta = [date, category].filter(Boolean).join(" · ");
+  const descriptionStartY = bodyY + 68 + titleLines.length * 62;
+  const tagsY = cardY + cardHeight - 76;
+  const tagsSvg = renderTagPills(tags, hue, bodyX, tagsY);
+  const statsLabel = `${formatCountLabel(reactionCount, "reaction")}   ${formatCountLabel(commentCount, "comment")}`;
 
   const svg = `
   <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="frame-bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#0f172a"/>
-        <stop offset="1" stop-color="#111827"/>
-      </linearGradient>
-      <radialGradient id="frame-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(960 60) rotate(140) scale(520 420)">
-        <stop stop-color="hsla(${hue}, 90%, 60%, 0.34)"/>
-        <stop offset="1" stop-color="hsla(${hue}, 90%, 60%, 0)"/>
-      </radialGradient>
       <linearGradient id="banner-fallback" x1="0" y1="0" x2="1" y2="1">
         <stop stop-color="hsla(${hue}, 70%, 26%, 0.9)"/>
         <stop offset="1" stop-color="#172033"/>
@@ -251,14 +268,8 @@ function renderCard({
       <clipPath id="banner-clip">
         <path d="M${cardX + 24} ${cardY}H${cardX + cardWidth - 24}C${cardX + cardWidth - 10.745} ${cardY} ${cardX + cardWidth} ${cardY + 10.745} ${cardX + cardWidth} ${cardY + 24}V${cardY + bannerHeight}H${cardX}V${cardY + 24}C${cardX} ${cardY + 10.745} ${cardX + 10.745} ${cardY} ${cardX + 24} ${cardY}Z"/>
       </clipPath>
-      <filter id="shadow" x="80" y="24" width="1040" height="590" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-        <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="rgba(15,23,42,0.45)"/>
-      </filter>
     </defs>
-    <rect width="1200" height="630" rx="36" fill="url(#frame-bg)"/>
-    <rect width="1200" height="630" rx="36" fill="url(#frame-glow)"/>
-    <g filter="url(#shadow)">
-      <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24" fill="#0f1720" stroke="rgba(148,163,184,0.18)"/>
+    <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24" fill="#0f1720" stroke="rgba(148,163,184,0.18)"/>
       <g clip-path="url(#banner-clip)">
         ${bannerImage
           ? `<image href="${bannerImage}" x="${cardX}" y="${cardY}" width="${cardWidth}" height="${bannerHeight}" preserveAspectRatio="xMidYMid slice"/>`
@@ -268,9 +279,10 @@ function renderCard({
       </g>
       <line x1="${cardX}" x2="${cardX + cardWidth}" y1="${cardY + bannerHeight}" y2="${cardY + bannerHeight}" stroke="rgba(148,163,184,0.14)"/>
       <text x="${bodyX}" y="${bodyY}" fill="#94a3b8" font-size="20" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="0.8">${escapeXml(meta || eyebrow)}</text>
-      ${titleLines.map((line, index) => `<text x="${bodyX}" y="${bodyY + 54 + index * 52}" fill="#f8fafc" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="800">${escapeXml(line)}</text>`).join("")}
-      ${descLines.map((line, index) => `<text x="${bodyX}" y="${bodyY + 194 + index * 30}" fill="#cbd5e1" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="500">${escapeXml(line)}</text>`).join("")}
-    </g>
+      ${titleLines.map((line, index) => `<text x="${bodyX}" y="${bodyY + 54 + index * 62}" fill="#f8fafc" font-size="54" font-family="Arial, Helvetica, sans-serif" font-weight="800">${escapeXml(line)}</text>`).join("")}
+      ${descLines.map((line, index) => `<text x="${bodyX}" y="${descriptionStartY + index * 34}" fill="#cbd5e1" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="500">${escapeXml(line)}</text>`).join("")}
+      ${tagsSvg}
+      <text x="${cardWidth - 320}" y="${tagsY + 28}" fill="#94a3b8" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">${escapeXml(statsLabel)}</text>
   </svg>`;
 
   const resvg = new Resvg(svg, {
@@ -329,6 +341,7 @@ renderCard(
   {
     title: "Jairus' Blog",
     description: "Build notes, release notes, and opinions with receipts.",
+    tags: ["assemblyscript", "tooling", "performance"],
     eyebrow: "Jairus' Blog",
   },
   "site.png"
@@ -339,10 +352,13 @@ for (const post of posts) {
     {
       title: post.title,
       description: post.description,
+      tags: post.tags,
       eyebrow: post.category || "Post",
       banner: post.banner,
       date: post.date,
       category: post.category,
+      reactionCount: post.reactionCount,
+      commentCount: post.commentCount,
     },
     `${post.slug}.png`
   );
