@@ -187,43 +187,90 @@ function colorFromString(input) {
   return Math.abs(hash) % 360;
 }
 
-function renderCard({ title, description, tags = [], eyebrow = "Jairus' Blog" }, outputName) {
-  const hue = colorFromString(`${title}${tags.join("")}`);
-  const titleLines = wrapLines(title, 26).slice(0, 3);
-  const descLines = wrapLines(description, 52).slice(0, 3);
-  const tagItems = tags.slice(0, 4);
+function getImageDataUri(input) {
+  if (!input || /^https?:\/\//.test(input)) return "";
+
+  const cleanPath = input.startsWith("/") ? input.slice(1) : input;
+  const filePath = path.join(root, "public", cleanPath);
+  if (!fs.existsSync(filePath)) return "";
+
+  const extension = path.extname(filePath).toLowerCase();
+  const mimeType = extension === ".png"
+    ? "image/png"
+    : extension === ".webp"
+      ? "image/webp"
+      : "image/jpeg";
+
+  return `data:${mimeType};base64,${fs.readFileSync(filePath).toString("base64")}`;
+}
+
+
+function renderCard({
+  title,
+  description,
+  eyebrow = "Jairus' Blog",
+  banner = "",
+  date = "",
+  category = "",
+}, outputName) {
+  const hue = colorFromString(`${title}${category}${description}`);
+  const titleLines = wrapLines(title, 28).slice(0, 3);
+  const descLines = wrapLines(description, 60).slice(0, 3);
+  const bannerImage = getImageDataUri(banner);
+  const cardX = 120;
+  const cardY = 48;
+  const cardWidth = 960;
+  const cardHeight = 534;
+  const bannerHeight = 214;
+  const bodyX = cardX + 44;
+  const bodyY = cardY + bannerHeight + 46;
+  const meta = [date, category].filter(Boolean).join(" · ");
 
   const svg = `
   <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <linearGradient id="frame-bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
         <stop stop-color="#0f172a"/>
         <stop offset="1" stop-color="#111827"/>
       </linearGradient>
-      <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(960 60) rotate(140) scale(520 420)">
-        <stop stop-color="hsla(${hue}, 90%, 60%, 0.35)"/>
+      <radialGradient id="frame-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(960 60) rotate(140) scale(520 420)">
+        <stop stop-color="hsla(${hue}, 90%, 60%, 0.34)"/>
         <stop offset="1" stop-color="hsla(${hue}, 90%, 60%, 0)"/>
       </radialGradient>
+      <linearGradient id="banner-fallback" x1="0" y1="0" x2="1" y2="1">
+        <stop stop-color="hsla(${hue}, 70%, 26%, 0.9)"/>
+        <stop offset="1" stop-color="#172033"/>
+      </linearGradient>
+      <linearGradient id="banner-overlay" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="rgba(15,23,32,0.03)"/>
+        <stop offset="1" stop-color="rgba(15,23,32,0.18)"/>
+      </linearGradient>
+      <clipPath id="card-clip">
+        <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24"/>
+      </clipPath>
+      <clipPath id="banner-clip">
+        <path d="M${cardX + 24} ${cardY}H${cardX + cardWidth - 24}C${cardX + cardWidth - 10.745} ${cardY} ${cardX + cardWidth} ${cardY + 10.745} ${cardX + cardWidth} ${cardY + 24}V${cardY + bannerHeight}H${cardX}V${cardY + 24}C${cardX} ${cardY + 10.745} ${cardX + 10.745} ${cardY} ${cardX + 24} ${cardY}Z"/>
+      </clipPath>
+      <filter id="shadow" x="80" y="24" width="1040" height="590" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+        <feDropShadow dx="0" dy="24" stdDeviation="28" flood-color="rgba(15,23,42,0.45)"/>
+      </filter>
     </defs>
-    <rect width="1200" height="630" rx="36" fill="url(#bg)"/>
-    <rect width="1200" height="630" rx="36" fill="url(#glow)"/>
-    <rect x="42" y="42" width="1116" height="546" rx="28" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
-    <text x="82" y="104" fill="#7dd3fc" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="2">${escapeXml(eyebrow.toUpperCase())}</text>
-    ${titleLines.map((line, index) => `<text x="82" y="${180 + index * 78}" fill="#f8fafc" font-size="62" font-family="Arial, Helvetica, sans-serif" font-weight="800">${escapeXml(line)}</text>`).join("")}
-    ${descLines.map((line, index) => `<text x="82" y="${390 + index * 38}" fill="#cbd5e1" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="500">${escapeXml(line)}</text>`).join("")}
-    ${(() => {
-      let offsetX = 82;
-      return tagItems.map((tag, index) => {
-        const width = Math.max(92, 32 + tag.length * 13);
-        const x = offsetX;
-        offsetX += width + 14;
-        return `
-          <rect x="${x}" y="500" width="${width}" height="42" rx="21" fill="hsla(${(hue + index * 28) % 360}, 80%, 55%, 0.14)" stroke="hsla(${(hue + index * 28) % 360}, 90%, 68%, 0.38)"/>
-          <text x="${x + 18}" y="528" fill="#e2e8f0" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">${escapeXml(tag)}</text>
-        `;
-      }).join("");
-    })()}
-    <text x="82" y="576" fill="#94a3b8" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="600">blog.jairus.dev</text>
+    <rect width="1200" height="630" rx="36" fill="url(#frame-bg)"/>
+    <rect width="1200" height="630" rx="36" fill="url(#frame-glow)"/>
+    <g filter="url(#shadow)">
+      <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24" fill="#0f1720" stroke="rgba(148,163,184,0.18)"/>
+      <g clip-path="url(#banner-clip)">
+        ${bannerImage
+          ? `<image href="${bannerImage}" x="${cardX}" y="${cardY}" width="${cardWidth}" height="${bannerHeight}" preserveAspectRatio="xMidYMid slice"/>`
+          : `<rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${bannerHeight}" fill="url(#banner-fallback)"/>`
+        }
+        <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${bannerHeight}" fill="url(#banner-overlay)"/>
+      </g>
+      <line x1="${cardX}" x2="${cardX + cardWidth}" y1="${cardY + bannerHeight}" y2="${cardY + bannerHeight}" stroke="rgba(148,163,184,0.14)"/>
+      <text x="${bodyX}" y="${bodyY}" fill="#94a3b8" font-size="20" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="0.8">${escapeXml(meta || eyebrow)}</text>
+      ${titleLines.map((line, index) => `<text x="${bodyX}" y="${bodyY + 54 + index * 52}" fill="#f8fafc" font-size="42" font-family="Arial, Helvetica, sans-serif" font-weight="800">${escapeXml(line)}</text>`).join("")}
+      ${descLines.map((line, index) => `<text x="${bodyX}" y="${bodyY + 194 + index * 30}" fill="#cbd5e1" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="500">${escapeXml(line)}</text>`).join("")}
+    </g>
   </svg>`;
 
   const resvg = new Resvg(svg, {
@@ -282,7 +329,6 @@ renderCard(
   {
     title: "Jairus' Blog",
     description: "Build notes, release notes, and opinions with receipts.",
-    tags: ["assemblyscript", "tooling", "performance"],
     eyebrow: "Jairus' Blog",
   },
   "site.png"
@@ -293,8 +339,10 @@ for (const post of posts) {
     {
       title: post.title,
       description: post.description,
-      tags: post.tags,
       eyebrow: post.category || "Post",
+      banner: post.banner,
+      date: post.date,
+      category: post.category,
     },
     `${post.slug}.png`
   );
