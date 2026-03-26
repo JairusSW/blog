@@ -1,0 +1,17 @@
+[
+  {
+    "slug": "quickly-parsing-unicode-escapes-with-swar",
+    "title": "Quickly parsing Unicode Escapes with SWAR",
+    "description": "Parsing JSON unicode escape sequences with SWAR instead of branches or lookup tables.",
+    "date": "March 25, 2026",
+    "category": "Performance",
+    "banner": "/images/unicode-escapes-swar-banner.jpg",
+    "bannerAlt": "Abstract banner image for unicode parsing post",
+    "tags": [
+      "performance",
+      "swar",
+      "assemblyscript"
+    ],
+    "mtimeMs": 1774496485228.9358
+  }
+]
