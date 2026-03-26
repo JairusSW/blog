@@ -61,7 +61,10 @@ export default defineConfig({
       performance: "#5eead4",
       json: "#f59e0b",
       swar: "#60a5fa",
-      assemblyscript: "#f472b6",
+      assemblyscript: "#2563eb",
+      webassembly: "#7c3aed",
+      testing: "#34d399",
+      fuzzing: "#f87171",
     },
     sidebar: {
       "/posts/": [

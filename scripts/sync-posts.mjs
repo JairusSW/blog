@@ -19,6 +19,21 @@ const homePath = path.join(root, "index.md");
 const aboutPath = path.join(root, "about.md");
 const archivePath = path.join(postsDir, "index.md");
 
+function readTagColorOverrides() {
+  const config = fs.readFileSync(configPath, "utf8");
+  const match = config.match(/tagColors:\s*\{([\s\S]*?)\n\s*\},\n\s*sidebar:/);
+  if (!match) return {};
+
+  const overrides = {};
+  const entryPattern = /(\w+)\s*:\s*["']([^"']+)["']/g;
+  for (const entry of match[1].matchAll(entryPattern)) {
+    overrides[entry[1].toLowerCase()] = entry[2];
+  }
+  return overrides;
+}
+
+const tagColorOverrides = readTagColorOverrides();
+
 fs.mkdirSync(socialDir, { recursive: true });
 
 function slugToTitle(slug) {
@@ -187,6 +202,42 @@ function colorFromString(input) {
   return Math.abs(hash) % 360;
 }
 
+function hexToRgb(hex) {
+  const normalized = hex.replace("#", "").trim();
+  const value = normalized.length === 3
+    ? normalized.split("").map((part) => part + part).join("")
+    : normalized;
+
+  if (!/^[0-9a-fA-F]{6}$/.test(value)) return null;
+
+  return {
+    r: parseInt(value.slice(0, 2), 16),
+    g: parseInt(value.slice(2, 4), 16),
+    b: parseInt(value.slice(4, 6), 16),
+  };
+}
+
+function resolveTagPalette(tag, index, baseHue) {
+  const override = tagColorOverrides[String(tag).toLowerCase()];
+  if (override) {
+    const rgb = hexToRgb(override);
+    if (rgb) {
+      return {
+        background: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.16)`,
+        border: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.42)`,
+        text: `rgb(${Math.round(rgb.r + (255 - rgb.r) * 0.26)}, ${Math.round(rgb.g + (255 - rgb.g) * 0.26)}, ${Math.round(rgb.b + (255 - rgb.b) * 0.26)})`,
+      };
+    }
+  }
+
+  const hue = (baseHue + index * 28) % 360;
+  return {
+    background: `hsla(${hue}, 78%, 52%, 0.12)`,
+    border: `hsla(${hue}, 78%, 52%, 0.32)`,
+    text: `hsl(${hue}, 88%, 78%)`,
+  };
+}
+
 function getImageDataUri(input) {
   if (!input || /^https?:\/\//.test(input)) return "";
 
@@ -208,13 +259,13 @@ function getImageDataUri(input) {
 function renderTagPills(tags, baseHue, startX, y) {
   let offsetX = startX;
   return tags.slice(0, 4).map((tag, index) => {
-    const width = Math.max(92, 32 + tag.length * 13);
+    const width = Math.max(96, 34 + tag.length * 14);
     const x = offsetX;
     offsetX += width + 14;
-    const hue = (baseHue + index * 28) % 360;
+    const palette = resolveTagPalette(tag, index, baseHue);
     return `
-      <rect x="${x}" y="${y}" width="${width}" height="42" rx="21" fill="hsla(${hue}, 80%, 55%, 0.14)" stroke="hsla(${hue}, 90%, 68%, 0.38)"/>
-      <text x="${x + 18}" y="${y + 28}" fill="#e2e8f0" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">${escapeXml(tag)}</text>
+      <rect x="${x}" y="${y}" width="${width}" height="42" rx="21" fill="${palette.background}" stroke="${palette.border}"/>
+      <text x="${x + 18}" y="${y + 28}" fill="${palette.text}" font-size="22" font-family="SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace" font-weight="700">${escapeXml(tag)}</text>
     `;
   }).join("");
 }

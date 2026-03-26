@@ -5,7 +5,7 @@ export function tagStyle(tag: string, overrides: Record<string, string> = {}) {
     return {
       backgroundColor: `color-mix(in srgb, ${color} 16%, transparent)`,
       borderColor: `color-mix(in srgb, ${color} 42%, var(--vp-c-divider))`,
-      color,
+      color: `color-mix(in srgb, ${color} 74%, white 26%)`,
     };
   }
 
@@ -18,6 +18,6 @@ export function tagStyle(tag: string, overrides: Record<string, string> = {}) {
   return {
     backgroundColor: `hsla(${hue}, 78%, 52%, 0.12)`,
     borderColor: `hsla(${hue}, 78%, 52%, 0.32)`,
-    color: `hsl(${hue}, 80%, 68%)`,
+    color: `hsl(${hue}, 88%, 78%)`,
   };
 }
