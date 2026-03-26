@@ -46,8 +46,6 @@ head:
       content: 'https://blog.jairus.dev/images/fuzzing-in-assemblyscript-banner.png'
 ---
 
-# Fuzzing in AssemblyScript
-
 When I write normal tests, I usually already know which examples I care about.
 
 That is useful, but it also means I am guiding the code toward the paths I expect it to take. If the bug only shows up for a weird string, an empty array, a repeated value, or some unpleasant numeric edge case, a small handwritten test suite might never touch it.
