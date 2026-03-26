@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: "17 5 * * *"
   workflow_dispatch:
 
 permissions:
@@ -32,6 +34,8 @@ jobs:
         run: npm ci
 
       - name: Generate post metadata and social cards
+        env:
+          GH_DISCUSSIONS_TOKEN: ${{ secrets.GH_DISCUSSIONS_TOKEN }}
         run: npm run posts:sync
 
       - name: Setup Pages

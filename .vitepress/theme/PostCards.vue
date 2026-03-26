@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed } from "vue";
 import posts from "./posts.data.json";
-import PostStatsLoader from "./PostStatsLoader.vue";
 import PostTags from "./PostTags.vue";
 
 const props = withDefaults(defineProps<{
@@ -19,34 +18,10 @@ const filteredPosts = computed(() => normalizedTag.value
   ? posts.filter((post) => (post.tags || []).some((tag) => tag.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") === normalizedTag.value))
   : posts);
 const visiblePosts = computed(() => props.limit ? filteredPosts.value.slice(0, props.limit) : filteredPosts.value);
-const stats = ref<Record<string, { comments: number; reactions: number }>>({});
-
-function getPostStats(slug: string) {
-  return stats.value[slug] || { comments: 0, reactions: 0 };
-}
-
-function loadStats() {
-  try {
-    stats.value = JSON.parse(
-      localStorage.getItem("post-stats:v2")
-        || localStorage.getItem("post-stats:v1")
-        || "{}",
-    );
-  } catch {
-    stats.value = {};
-  }
-}
-
-onMounted(() => {
-  loadStats();
-  window.addEventListener("post-stats-updated", loadStats);
-});
 </script>
 
 <template>
   <section class="post-collection" :class="{ 'post-collection-compact': compact }">
-    <PostStatsLoader :posts="visiblePosts" />
-
     <div v-if="title || intro" class="post-collection-head">
       <h2 v-if="title">{{ title }}</h2>
       <p v-if="intro">{{ intro }}</p>
@@ -63,8 +38,8 @@ onMounted(() => {
           <div class="post-card-footer">
             <PostTags :tags="post.tags" />
             <div class="post-stats">
-              <span>{{ getPostStats(post.slug).reactions }} reactions</span>
-              <span>{{ getPostStats(post.slug).comments }} comments</span>
+              <span>{{ post.reactionCount || 0 }} reactions</span>
+              <span>{{ post.commentCount || 0 }} comments</span>
             </div>
           </div>
         </div>

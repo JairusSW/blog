@@ -14,7 +14,9 @@
       "assemblyscript",
       "webassembly"
     ],
-    "mtimeMs": 1774502821876.6013
+    "commentCount": 0,
+    "reactionCount": 0,
+    "mtimeMs": 1774504516780.475
   },
   {
     "slug": "quickly-parsing-unicode-escapes-with-swar",
@@ -30,6 +32,8 @@
       "swar",
       "assemblyscript"
     ],
-    "mtimeMs": 1774502821875.6013
+    "commentCount": 0,
+    "reactionCount": 0,
+    "mtimeMs": 1774504516780.475
   }
 ]

@@ -6,6 +6,9 @@ import { Resvg } from "@resvg/resvg-js";
 const root = "/home/port/Code/blog";
 const siteUrl = "https://blog.jairus.dev";
 const defaultSocialImage = "/social/site.png";
+const githubToken = process.env.GH_DISCUSSIONS_TOKEN || process.env.GITHUB_TOKEN || "";
+const githubRepoOwner = "JairusSW";
+const githubRepoName = "blog";
 const postsDir = path.join(root, "posts");
 const tagsDir = path.join(root, "tags");
 const socialDir = path.join(root, "public", "social");
@@ -42,6 +45,86 @@ function absoluteUrl(input) {
   if (!input) return `${siteUrl}${defaultSocialImage}`;
   if (/^https?:\/\//.test(input)) return input;
   return `${siteUrl}${input.startsWith("/") ? input : `/${input}`}`;
+}
+
+async function fetchDiscussionCounts(posts) {
+  if (!githubToken) {
+    return new Map();
+  }
+
+  const query = `
+    query DiscussionCounts($owner: String!, $name: String!, $endCursor: String) {
+      repository(owner: $owner, name: $name) {
+        discussions(first: 100, after: $endCursor) {
+          nodes {
+            title
+            comments {
+              totalCount
+            }
+            reactions {
+              totalCount
+            }
+          }
+          pageInfo {
+            hasNextPage
+            endCursor
+          }
+        }
+      }
+    }
+  `;
+
+  const byPathname = new Map(posts.map((post) => [`/posts/${post.slug}`, post.slug]));
+  const counts = new Map();
+  let endCursor = null;
+
+  while (true) {
+    const response = await fetch("https://api.github.com/graphql", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${githubToken}`,
+      },
+      body: JSON.stringify({
+        query,
+        variables: {
+          owner: githubRepoOwner,
+          name: githubRepoName,
+          endCursor,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`GitHub GraphQL request failed: ${response.status} ${response.statusText}`);
+    }
+
+    const payload = await response.json();
+    if (payload.errors?.length) {
+      throw new Error(`GitHub GraphQL error: ${payload.errors.map((error) => error.message).join("; ")}`);
+    }
+
+    const connection = payload.data?.repository?.discussions;
+    const nodes = connection?.nodes || [];
+
+    for (const discussion of nodes) {
+      const title = String(discussion?.title || "");
+      for (const [pathname, slug] of byPathname.entries()) {
+        if (!title.includes(pathname)) continue;
+        counts.set(slug, {
+          comments: Number(discussion?.comments?.totalCount || 0),
+          reactions: Number(discussion?.reactions?.totalCount || 0),
+        });
+      }
+    }
+
+    if (!connection?.pageInfo?.hasNextPage) {
+      break;
+    }
+    endCursor = connection.pageInfo.endCursor;
+  }
+
+  return counts;
 }
 
 function buildHead({ title, description, image, url, type = "article" }) {
@@ -172,10 +255,24 @@ const posts = fs.readdirSync(postsDir)
       bannerAlt: parsed.data.bannerAlt || "",
       socialImage: parsed.data.socialImage || `/social/${slug}.png`,
       tags,
+      commentCount: 0,
+      reactionCount: 0,
       mtimeMs: stat.mtimeMs,
     };
   })
   .sort((a, b) => b.mtimeMs - a.mtimeMs);
+
+try {
+  const discussionCounts = await fetchDiscussionCounts(posts);
+  for (const post of posts) {
+    const counts = discussionCounts.get(post.slug);
+    if (!counts) continue;
+    post.commentCount = counts.comments;
+    post.reactionCount = counts.reactions;
+  }
+} catch (error) {
+  console.warn(`Unable to fetch GitHub discussion counts: ${error.message}`);
+}
 
 renderCard(
   {

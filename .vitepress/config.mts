@@ -52,7 +52,7 @@ export default defineConfig({
       mapping: "pathname",
       strict: "0",
       reactionsEnabled: "1",
-      emitMetadata: "1",
+      emitMetadata: "0",
       inputPosition: "bottom",
       lang: "en",
       loading: "lazy",
