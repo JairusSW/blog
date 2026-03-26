@@ -2,6 +2,11 @@
   {
     "slug": "assemblyscript",
     "name": "assemblyscript",
+    "count": 2
+  },
+  {
+    "slug": "fuzzing",
+    "name": "fuzzing",
     "count": 1
   },
   {
@@ -12,6 +17,16 @@
   {
     "slug": "swar",
     "name": "swar",
+    "count": 1
+  },
+  {
+    "slug": "testing",
+    "name": "testing",
+    "count": 1
+  },
+  {
+    "slug": "webassembly",
+    "name": "webassembly",
     "count": 1
   }
 ]

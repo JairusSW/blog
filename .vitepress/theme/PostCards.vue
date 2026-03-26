@@ -21,9 +21,17 @@ const filteredPosts = computed(() => normalizedTag.value
 const visiblePosts = computed(() => props.limit ? filteredPosts.value.slice(0, props.limit) : filteredPosts.value);
 const stats = ref<Record<string, { comments: number; reactions: number }>>({});
 
+function getPostStats(slug: string) {
+  return stats.value[slug] || { comments: 0, reactions: 0 };
+}
+
 function loadStats() {
   try {
-    stats.value = JSON.parse(localStorage.getItem("post-stats:v1") || "{}");
+    stats.value = JSON.parse(
+      localStorage.getItem("post-stats:v2")
+        || localStorage.getItem("post-stats:v1")
+        || "{}",
+    );
   } catch {
     stats.value = {};
   }
@@ -47,14 +55,17 @@ onMounted(() => {
     <div class="post-collection-grid">
       <a v-for="post in visiblePosts" :key="post.slug" class="post-card" :href="`/posts/${post.slug}`">
         <img v-if="post.banner" class="post-card-banner" :src="post.banner" :alt="post.bannerAlt || post.title" loading="lazy" />
+        <div v-else class="post-card-banner post-card-banner-placeholder" aria-hidden="true"></div>
         <div class="post-card-body">
           <span class="post-meta">{{ post.date }} · {{ post.category }}</span>
           <strong>{{ post.title }}</strong>
           <p>{{ post.description }}</p>
-          <PostTags :tags="post.tags" />
-          <div v-if="stats[post.slug]" class="post-stats">
-            <span>{{ stats[post.slug].reactions }} reactions</span>
-            <span>{{ stats[post.slug].comments }} comments</span>
+          <div class="post-card-footer">
+            <PostTags :tags="post.tags" />
+            <div class="post-stats">
+              <span>{{ getPostStats(post.slug).reactions }} reactions</span>
+              <span>{{ getPostStats(post.slug).comments }} comments</span>
+            </div>
           </div>
         </div>
       </a>

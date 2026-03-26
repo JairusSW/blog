@@ -35,9 +35,6 @@
   color: var(--vp-c-text-2);
 }
 
-.vp-doc > h1:first-of-type {
-  display: none;
-}
 
 .post-collection {
   margin: 2rem 0;
@@ -67,7 +64,8 @@
 
 .post-card {
   color: inherit;
-  display: block;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   border: 1px solid var(--vp-c-divider);
   border-radius: 20px;
@@ -90,7 +88,16 @@
   background: var(--vp-c-bg-soft);
 }
 
+.post-card-banner-placeholder {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--vp-c-bg-soft) 88%, white 12%), color-mix(in srgb, var(--vp-c-bg) 80%, var(--vp-c-brand-1) 20%));
+  border-bottom: 1px solid color-mix(in srgb, var(--vp-c-divider) 82%, transparent);
+}
+
 .post-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
   padding: 1rem 1.05rem 1.1rem;
 }
 
@@ -113,6 +120,11 @@
   margin: 0;
   color: var(--vp-c-text-2);
 }
+
+.post-card-footer {
+  margin-top: auto;
+}
+
 
 .post-tags {
   display: flex;

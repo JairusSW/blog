@@ -1,15 +1,22 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { Resvg } from "@resvg/resvg-js";
 
 const root = "/home/port/Code/blog";
+const siteUrl = "https://blog.jairus.dev";
+const defaultSocialImage = "/social/site.png";
 const postsDir = path.join(root, "posts");
 const tagsDir = path.join(root, "tags");
+const socialDir = path.join(root, "public", "social");
 const dataPath = path.join(root, ".vitepress", "theme", "posts.data.json");
 const tagsDataPath = path.join(root, ".vitepress", "theme", "tags.data.json");
 const configPath = path.join(root, ".vitepress", "config.mts");
 const homePath = path.join(root, "index.md");
+const aboutPath = path.join(root, "about.md");
 const archivePath = path.join(postsDir, "index.md");
+
+fs.mkdirSync(socialDir, { recursive: true });
 
 function slugToTitle(slug) {
   return slug
@@ -31,6 +38,114 @@ function slugifyTag(tag) {
     .replace(/^-+|-+$/g, "");
 }
 
+function absoluteUrl(input) {
+  if (!input) return `${siteUrl}${defaultSocialImage}`;
+  if (/^https?:\/\//.test(input)) return input;
+  return `${siteUrl}${input.startsWith("/") ? input : `/${input}`}`;
+}
+
+function buildHead({ title, description, image, url, type = "article" }) {
+  return [
+    ["meta", { property: "og:title", content: title }],
+    ["meta", { property: "og:description", content: description }],
+    ["meta", { property: "og:image", content: image }],
+    ["meta", { property: "og:url", content: url }],
+    ["meta", { property: "og:type", content: type }],
+    ["meta", { name: "twitter:card", content: "summary_large_image" }],
+    ["meta", { name: "twitter:title", content: title }],
+    ["meta", { name: "twitter:description", content: description }],
+    ["meta", { name: "twitter:image", content: image }],
+  ];
+}
+
+function updateMarkdownFile(filePath, mutate) {
+  const raw = fs.readFileSync(filePath, "utf8");
+  const parsed = matter(raw);
+  const next = mutate(parsed);
+  fs.writeFileSync(filePath, matter.stringify(next.content, next.data));
+}
+
+function escapeXml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function wrapLines(text, maxChars) {
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = "";
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length > maxChars && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function colorFromString(input) {
+  let hash = 0;
+  for (let i = 0; i < input.length; i += 1) {
+    hash = ((hash << 5) - hash) + input.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) % 360;
+}
+
+function renderCard({ title, description, tags = [], eyebrow = "Jairus' Blog" }, outputName) {
+  const hue = colorFromString(`${title}${tags.join("")}`);
+  const titleLines = wrapLines(title, 26).slice(0, 3);
+  const descLines = wrapLines(description, 52).slice(0, 3);
+  const tagItems = tags.slice(0, 4);
+
+  const svg = `
+  <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#0f172a"/>
+        <stop offset="1" stop-color="#111827"/>
+      </linearGradient>
+      <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(960 60) rotate(140) scale(520 420)">
+        <stop stop-color="hsla(${hue}, 90%, 60%, 0.35)"/>
+        <stop offset="1" stop-color="hsla(${hue}, 90%, 60%, 0)"/>
+      </radialGradient>
+    </defs>
+    <rect width="1200" height="630" rx="36" fill="url(#bg)"/>
+    <rect width="1200" height="630" rx="36" fill="url(#glow)"/>
+    <rect x="42" y="42" width="1116" height="546" rx="28" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.08)"/>
+    <text x="82" y="104" fill="#7dd3fc" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="2">${escapeXml(eyebrow.toUpperCase())}</text>
+    ${titleLines.map((line, index) => `<text x="82" y="${180 + index * 78}" fill="#f8fafc" font-size="62" font-family="Arial, Helvetica, sans-serif" font-weight="800">${escapeXml(line)}</text>`).join("")}
+    ${descLines.map((line, index) => `<text x="82" y="${390 + index * 38}" fill="#cbd5e1" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="500">${escapeXml(line)}</text>`).join("")}
+    ${(() => {
+      let offsetX = 82;
+      return tagItems.map((tag, index) => {
+        const width = Math.max(92, 32 + tag.length * 13);
+        const x = offsetX;
+        offsetX += width + 14;
+        return `
+          <rect x="${x}" y="500" width="${width}" height="42" rx="21" fill="hsla(${(hue + index * 28) % 360}, 80%, 55%, 0.14)" stroke="hsla(${(hue + index * 28) % 360}, 90%, 68%, 0.38)"/>
+          <text x="${x + 18}" y="528" fill="#e2e8f0" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">${escapeXml(tag)}</text>
+        `;
+      }).join("");
+    })()}
+    <text x="82" y="576" fill="#94a3b8" font-size="24" font-family="Arial, Helvetica, sans-serif" font-weight="600">blog.jairus.dev</text>
+  </svg>`;
+
+  const resvg = new Resvg(svg, {
+    fitTo: { mode: "width", value: 1200 },
+  });
+  const png = resvg.render().asPng();
+  fs.writeFileSync(path.join(socialDir, outputName), png);
+}
+
 const posts = fs.readdirSync(postsDir)
   .filter((file) => file.endsWith(".md") && file !== "index.md")
   .map((file) => {
@@ -40,23 +155,66 @@ const posts = fs.readdirSync(postsDir)
     const parsed = matter(raw);
     const slug = file.replace(/\.md$/, "");
     const tags = Array.isArray(parsed.data.tags) ? parsed.data.tags.map(String) : [];
+    const title = parsed.data.title || slugToTitle(slug);
+    const description = parsed.data.description || summarize(parsed.content, 140);
+    const date = parsed.data.date || new Date(stat.mtime).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
     return {
       slug,
-      title: parsed.data.title || slugToTitle(slug),
-      description: parsed.data.description || summarize(parsed.content, 140),
-      date: parsed.data.date || new Date(stat.mtime).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      }),
+      title,
+      description,
+      date,
       category: parsed.data.category || "Post",
       banner: parsed.data.banner || "",
       bannerAlt: parsed.data.bannerAlt || "",
+      socialImage: parsed.data.socialImage || `/social/${slug}.png`,
       tags,
-      mtimeMs: stat.mtimeMs
+      mtimeMs: stat.mtimeMs,
     };
   })
   .sort((a, b) => b.mtimeMs - a.mtimeMs);
+
+renderCard(
+  {
+    title: "Jairus' Blog",
+    description: "Build notes, release notes, and opinions with receipts.",
+    tags: ["assemblyscript", "tooling", "performance"],
+    eyebrow: "Jairus' Blog",
+  },
+  "site.png"
+);
+
+for (const post of posts) {
+  renderCard(
+    {
+      title: post.title,
+      description: post.description,
+      tags: post.tags,
+      eyebrow: post.category || "Post",
+    },
+    `${post.slug}.png`
+  );
+}
+
+for (const post of posts) {
+  const filePath = path.join(postsDir, `${post.slug}.md`);
+  updateMarkdownFile(filePath, ({ data, content }) => ({
+    data: {
+      ...data,
+      socialImage: data.socialImage || post.socialImage,
+      head: buildHead({
+        title: post.title,
+        description: post.description,
+        image: absoluteUrl(data.socialImage || post.socialImage),
+        url: `${siteUrl}/posts/${post.slug}`,
+      }),
+    },
+    content,
+  }));
+}
 
 const tagMap = new Map();
 for (const post of posts) {
@@ -78,49 +236,106 @@ for (const entry of fs.readdirSync(tagsDir)) {
   if (entry.endsWith(".md")) fs.unlinkSync(path.join(tagsDir, entry));
 }
 
-const tagsIndex = [
-  "# Tags",
-  "",
-  "Browse posts by topic.",
-  "",
-  '<TagDirectory />',
-  ""
-].join("\n");
-fs.writeFileSync(path.join(tagsDir, "index.md"), tagsIndex);
+const tagsIndex = matter.stringify(
+  '# Tags\n\nBrowse posts by topic.\n\n<TagDirectory />\n',
+  {
+    title: 'Tags',
+    description: 'Browse posts by topic on Jairus\' blog.',
+    head: buildHead({
+      title: 'Tags | Jairus\' Blog',
+      description: 'Browse posts by topic on Jairus\' blog.',
+      image: absoluteUrl(defaultSocialImage),
+      url: `${siteUrl}/tags/`,
+      type: 'website',
+    }),
+  }
+);
+fs.writeFileSync(path.join(tagsDir, 'index.md'), tagsIndex);
 
 for (const tag of tags) {
-  const content = [
-    `# ${tag.name}`,
-    "",
-    `<PostCards tag=\"${tag.slug}\" title=\"Tagged: ${tag.name}\" intro=\"Posts filed under ${tag.name}.\" />`,
-    ""
-  ].join("\n");
+  const content = matter.stringify(
+    `<PostCards tag="${tag.slug}" title="Tagged: ${tag.name}" intro="Posts filed under ${tag.name}." />\n`,
+    {
+      title: tag.name,
+      description: `Posts filed under ${tag.name}.`,
+      head: buildHead({
+        title: `${tag.name} | Jairus' Blog`,
+        description: `Posts filed under ${tag.name}.`,
+        image: absoluteUrl(defaultSocialImage),
+        url: `${siteUrl}/tags/${tag.slug}`,
+        type: 'website',
+      }),
+    }
+  );
   fs.writeFileSync(path.join(tagsDir, `${tag.slug}.md`), content);
 }
 
-const archive = [
-  "# Archive",
-  "",
-  '<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, run `npm run posts:sync`, and this page updates automatically." />',
-  ""
-].join("\n");
+const archive = matter.stringify(
+  '<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, run `npm run posts:sync`, and this page updates automatically." />\n',
+  {
+    title: 'Archive',
+    description: 'Browse every post on Jairus\' blog.',
+    head: buildHead({
+      title: 'Archive | Jairus\' Blog',
+      description: 'Browse every post on Jairus\' blog.',
+      image: absoluteUrl(defaultSocialImage),
+      url: `${siteUrl}/posts/`,
+      type: 'website',
+    }),
+  }
+);
 fs.writeFileSync(archivePath, archive);
 
-const config = fs.readFileSync(configPath, "utf8");
+const config = fs.readFileSync(configPath, 'utf8');
 const sidebarItems = posts
   .map((post) => `            { text: ${JSON.stringify(post.title)}, link: "/posts/${post.slug}" },`)
-  .join("\n");
-const nextConfig = config.replace(
-  /(\/posts\/": \[\n\s*\{\n\s*text: "Posts",\n\s*items: \[\n)([\s\S]*?)(\n\s*\]\n\s*\}\n\s*\])/, 
-  `$1            { text: "Archive", link: "/posts/" },\n${sidebarItems}$3`
-);
+  .join('\n');
+const postsSidebarStart = config.indexOf('"/posts/": [');
+let nextConfig = config;
+if (postsSidebarStart !== -1) {
+  const itemsStart = config.indexOf('items: [', postsSidebarStart);
+  const itemsEnd = config.indexOf('\n          ],', itemsStart);
+  if (itemsStart !== -1 && itemsEnd !== -1) {
+    const before = config.slice(0, itemsStart + 'items: ['.length);
+    const after = config.slice(itemsEnd);
+    nextConfig = `${before}\n            { text: "Archive", link: "/posts/" },\n${sidebarItems}${after}`;
+  }
+}
+nextConfig = nextConfig.replace(/giscus: \{([\s\S]*?)loading: "lazy",\n\s*tagColors:/, 'giscus: {$1loading: "lazy",\n    },\n    tagColors:');
 fs.writeFileSync(configPath, nextConfig);
 
 const latest = posts[0];
 if (latest) {
-  const home = fs.readFileSync(homePath, "utf8");
-  const nextHome = home.replace(/link: \/posts\/[A-Za-z0-9-]+/, `link: /posts/${latest.slug}`);
-  fs.writeFileSync(homePath, nextHome);
+  updateMarkdownFile(homePath, ({ data, content }) => ({
+    data: {
+      ...data,
+      description: data.description || 'Build notes, release notes, and opinions with receipts.',
+      head: buildHead({
+        title: `${data.hero?.name || "Jairus' Blog"}`,
+        description: data.description || 'Build notes, release notes, and opinions with receipts.',
+        image: absoluteUrl(defaultSocialImage),
+        url: `${siteUrl}/`,
+        type: 'website',
+      }),
+    },
+    content: content.replace(/link: \/posts\/[A-Za-z0-9-]+/, `link: /posts/${latest.slug}`),
+  }));
 }
+
+updateMarkdownFile(aboutPath, ({ data, content }) => ({
+  data: {
+    ...data,
+    title: data.title || 'About',
+    description: data.description || 'About Jairus Tanaka and the work behind this blog.',
+    head: buildHead({
+      title: 'About | Jairus\' Blog',
+      description: data.description || 'About Jairus Tanaka and the work behind this blog.',
+      image: absoluteUrl(defaultSocialImage),
+      url: `${siteUrl}/about`,
+      type: 'website',
+    }),
+  },
+  content,
+}));
 
 console.log(`Synced ${posts.length} posts and ${tags.length} tags.`);

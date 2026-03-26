@@ -1,6 +1,8 @@
 ---
 title: Quickly parsing Unicode Escapes with SWAR
-description: Parsing JSON unicode escape sequences with SWAR instead of branches or lookup tables.
+description: >-
+  Parsing JSON unicode escape sequences with SWAR instead of branches or lookup
+  tables.
 category: Performance
 tags:
   - performance
@@ -8,6 +10,41 @@ tags:
   - assemblyscript
 banner: /images/unicode-escapes-swar-banner.jpg
 bannerAlt: Abstract banner image for unicode parsing post
+head:
+  - - meta
+    - property: 'og:title'
+      content: Quickly parsing Unicode Escapes with SWAR
+  - - meta
+    - property: 'og:description'
+      content: >-
+        Parsing JSON unicode escape sequences with SWAR instead of branches or
+        lookup tables.
+  - - meta
+    - property: 'og:image'
+      content: >-
+        https://blog.jairus.dev/social/quickly-parsing-unicode-escapes-with-swar.png
+  - - meta
+    - property: 'og:url'
+      content: 'https://blog.jairus.dev/posts/quickly-parsing-unicode-escapes-with-swar'
+  - - meta
+    - property: 'og:type'
+      content: article
+  - - meta
+    - name: 'twitter:card'
+      content: summary_large_image
+  - - meta
+    - name: 'twitter:title'
+      content: Quickly parsing Unicode Escapes with SWAR
+  - - meta
+    - name: 'twitter:description'
+      content: >-
+        Parsing JSON unicode escape sequences with SWAR instead of branches or
+        lookup tables.
+  - - meta
+    - name: 'twitter:image'
+      content: >-
+        https://blog.jairus.dev/social/quickly-parsing-unicode-escapes-with-swar.png
+socialImage: /social/quickly-parsing-unicode-escapes-with-swar.png
 ---
 
 # Quickly parsing Unicode Escapes with SWAR

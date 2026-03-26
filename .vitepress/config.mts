@@ -56,12 +56,12 @@ export default defineConfig({
       inputPosition: "bottom",
       lang: "en",
       loading: "lazy",
+    },
     tagColors: {
       performance: "#5eead4",
       json: "#f59e0b",
       swar: "#60a5fa",
       assemblyscript: "#f472b6",
-    },
     },
     sidebar: {
       "/posts/": [
@@ -69,10 +69,8 @@ export default defineConfig({
           text: "Posts",
           items: [
             { text: "Archive", link: "/posts/" },
-            {
-              text: "Quickly parsing Unicode Escapes with SWAR",
-              link: "/posts/quickly-parsing-unicode-escapes-with-swar",
-            },
+            { text: "Fuzzing in AssemblyScript", link: "/posts/fuzzing-in-assemblyscript" },
+            { text: "Quickly parsing Unicode Escapes with SWAR", link: "/posts/quickly-parsing-unicode-escapes-with-swar" },
           ],
         },
       ],

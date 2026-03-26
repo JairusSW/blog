@@ -10,23 +10,38 @@ const { isDark, theme } = useData();
 const container = ref<HTMLElement | null>(null);
 const queue = computed(() => props.posts ?? []);
 const giscus = computed(() => theme.value.giscus ?? {});
+const CACHE_KEY = "post-stats:v2";
+const STALE_AFTER_MS = 1000 * 60 * 60 * 6;
 
-function getStore() {
+type PostStatRecord = {
+  comments: number;
+  reactions: number;
+  fetchedAt?: number;
+};
+
+function getStore(): Record<string, PostStatRecord> {
   try {
-    return JSON.parse(localStorage.getItem("post-stats:v1") || "{}");
+    return JSON.parse(localStorage.getItem(CACHE_KEY) || "{}") as Record<
+      string,
+      PostStatRecord
+    >;
   } catch {
     return {};
   }
 }
 
-function setStore(slug: string, data: { comments: number; reactions: number }) {
+function setStore(slug: string, data: PostStatRecord) {
   const store = getStore();
-  store[slug] = data;
-  localStorage.setItem("post-stats:v1", JSON.stringify(store));
+  store[slug] = {
+    comments: Number(data.comments || 0),
+    reactions: Number(data.reactions || 0),
+    fetchedAt: Date.now(),
+  };
+  localStorage.setItem(CACHE_KEY, JSON.stringify(store));
   window.dispatchEvent(new CustomEvent("post-stats-updated"));
 }
 
-function readDiscussionStats(payload: any) {
+function readDiscussionStats(payload: any): { comments: number; reactions: number } {
   const discussion = payload?.discussion;
   if (!discussion) return { comments: 0, reactions: 0 };
 
@@ -34,11 +49,15 @@ function readDiscussionStats(payload: any) {
   const totalReplyCount = Number(discussion.totalReplyCount || 0);
 
   const reactions = Number(
-    discussion.reactions?.totalCount
-    || discussion.reactionCount
-    || (Array.isArray(discussion.reactionGroups)
-      ? discussion.reactionGroups.reduce((sum: number, group: any) => sum + Number(group?.users?.totalCount || group?.count || 0), 0)
-      : 0)
+    discussion.reactions?.totalCount ||
+      discussion.reactionCount ||
+      (Array.isArray(discussion.reactionGroups)
+        ? discussion.reactionGroups.reduce(
+            (sum: number, group: any) =>
+              sum + Number(group?.users?.totalCount || group?.count || 0),
+            0,
+          )
+        : 0),
   );
 
   return {
@@ -47,18 +66,18 @@ function readDiscussionStats(payload: any) {
   };
 }
 
-async function loadStats(slug: string) {
-  if (!container.value) return;
+async function queryDiscussionStats(term: string): Promise<{ comments: number; reactions: number } | null> {
+  if (!container.value) return null;
   container.value.innerHTML = "";
 
-  await new Promise<void>((resolve) => {
+  return await new Promise((resolve) => {
     let finished = false;
 
-    const done = () => {
+    const done = (value: { comments: number; reactions: number } | null) => {
       if (finished) return;
       finished = true;
       window.removeEventListener("message", onMessage);
-      resolve();
+      resolve(value);
     };
 
     const onMessage = (event: MessageEvent) => {
@@ -67,14 +86,12 @@ async function loadStats(slug: string) {
 
       const payload = event.data.giscus;
       if (payload.error) {
-        setStore(slug, { comments: 0, reactions: 0 });
-        done();
+        done(null);
         return;
       }
 
       if (payload.discussion) {
-        setStore(slug, readDiscussionStats(payload));
-        done();
+        done(readDiscussionStats(payload));
       }
     };
 
@@ -89,7 +106,7 @@ async function loadStats(slug: string) {
     script.setAttribute("data-category", giscus.value.category);
     script.setAttribute("data-category-id", giscus.value.categoryId);
     script.setAttribute("data-mapping", "specific");
-    script.setAttribute("data-term", `/posts/${slug}`);
+    script.setAttribute("data-term", term);
     script.setAttribute("data-strict", "1");
     script.setAttribute("data-reactions-enabled", giscus.value.reactionsEnabled ?? "1");
     script.setAttribute("data-emit-metadata", "1");
@@ -100,16 +117,41 @@ async function loadStats(slug: string) {
     container.value?.appendChild(script);
 
     window.setTimeout(() => {
-      setStore(slug, getStore()[slug] || { comments: 0, reactions: 0 });
-      done();
+      done(null);
     }, 3000);
+  });
+}
+
+function buildTerms(slug: string): string[] {
+  return [`/posts/${slug}`, `/posts/${slug}/`, `posts/${slug}`];
+}
+
+function isFresh(record?: PostStatRecord): boolean {
+  if (!record) return false;
+  if (!record.fetchedAt) return false;
+  return Date.now() - record.fetchedAt < STALE_AFTER_MS;
+}
+
+async function loadStats(slug: string) {
+  for (const term of buildTerms(slug)) {
+    const result = await queryDiscussionStats(term);
+    if (result) {
+      setStore(slug, result);
+      return;
+    }
+  }
+  const existing = getStore()[slug];
+  setStore(slug, {
+    comments: existing?.comments || 0,
+    reactions: existing?.reactions || 0,
   });
 }
 
 onMounted(async () => {
   const store = getStore();
   for (const post of queue.value) {
-    if (store[post.slug]) continue;
+    const current = store[post.slug];
+    if (isFresh(current)) continue;
     await loadStats(post.slug);
   }
   if (container.value) container.value.innerHTML = "";
