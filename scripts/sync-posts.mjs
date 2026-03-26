@@ -74,7 +74,11 @@ async function fetchDiscussionCounts(posts) {
     }
   `;
 
-  const byPathname = new Map(posts.map((post) => [`/posts/${post.slug}`, post.slug]));
+  const byPathname = new Map();
+  for (const post of posts) {
+    byPathname.set(`/posts/${post.slug}`, post.slug);
+    byPathname.set(`posts/${post.slug}`, post.slug);
+  }
   const counts = new Map();
   let endCursor = null;
 
