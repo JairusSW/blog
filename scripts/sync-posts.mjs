@@ -3,7 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import { Resvg } from "@resvg/resvg-js";
 
-const root = "/home/port/Code/blog";
+const root = process.cwd();
 const siteUrl = "https://blog.jairus.dev";
 const defaultSocialImage = "/social/site.png";
 const githubToken = process.env.GH_DISCUSSIONS_TOKEN || process.env.GITHUB_TOKEN || "";
