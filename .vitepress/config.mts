@@ -14,6 +14,8 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Archive", link: "/posts/" },
+      { text: "Tags", link: "/tags/" },
+      { text: "Docs", link: "https://docs.jairus.dev" },
       { text: "About", link: "/about" },
       { text: "GitHub", link: "https://github.com/JairusSW" },
     ],

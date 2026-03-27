@@ -13,6 +13,9 @@ hero:
       text: Browse archive
       link: /posts/
     - theme: alt
+      text: Browse tags
+      link: /tags/
+    - theme: alt
       text: About
       link: /about
 features:
@@ -58,5 +61,4 @@ head:
 <PostCards
   :limit="4"
   title="Recent Posts"
-  intro="The newest writing from the blog, rendered from post metadata instead of hand-maintained links."
 />
