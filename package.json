@@ -3,11 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "docs:dev": "vitepress dev .",
-    "docs:build": "vitepress build .",
-    "docs:preview": "vitepress preview .",
+    "blog:dev": "vitepress dev .",
+    "blog:build": "vitepress build .",
+    "blog:preview": "vitepress preview .",
     "posts:sync": "node scripts/sync-posts.mjs",
-    "social:check": "node scripts/check-social.mjs"
+    "social:check": "node scripts/check-social.mjs",
+    "images:compress": "bash scripts/compress-images.sh"
   },
   "devDependencies": {
     "vitepress": "^1.6.4"

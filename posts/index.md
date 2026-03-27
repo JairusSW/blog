@@ -1,13 +1,13 @@
 ---
 title: Archive
-description: Browse every post on Jairus' blog.
+description: List of all my previous posts.
 head:
   - - meta
     - property: 'og:title'
       content: Archive | Jairus' Blog
   - - meta
     - property: 'og:description'
-      content: Browse every post on Jairus' blog.
+      content: List of all my previous posts.
   - - meta
     - property: 'og:image'
       content: 'https://blog.jairus.dev/social/site.png'
@@ -25,9 +25,9 @@ head:
       content: Archive | Jairus' Blog
   - - meta
     - name: 'twitter:description'
-      content: Browse every post on Jairus' blog.
+      content: List of all my previous posts.
   - - meta
     - name: 'twitter:image'
       content: 'https://blog.jairus.dev/social/site.png'
 ---
-<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, and `npm run posts:sync` will assign the next `id`, preserve `createdAt`, and set missing `updatedAt` metadata." />
+<PostCards title="All Posts" intro="Check out some of my recent posts!" />
