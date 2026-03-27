@@ -1,4 +1,7 @@
 ---
+id: 2
+createdAt: '2026-03-26'
+updatedAt: '2026-03-26'
 title: Quickly parsing Unicode Escapes with SWAR
 description: >-
   Parsing JSON unicode escape sequences with SWAR instead of branches or lookup

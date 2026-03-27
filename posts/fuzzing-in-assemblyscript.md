@@ -1,4 +1,7 @@
 ---
+id: 1
+createdAt: '2026-03-26'
+updatedAt: '2026-03-26'
 title: Fuzzing in AssemblyScript
 description: >-
   How to add practical property-based fuzzing to an AssemblyScript project with
@@ -11,7 +14,6 @@ tags:
   - webassembly
 banner: /images/fuzzing-in-assemblyscript-banner.png
 bannerAlt: Abstract banner image for fuzzing in AssemblyScript
-socialImage: /images/fuzzing-in-assemblyscript-banner.png
 head:
   - - meta
     - property: 'og:title'
@@ -23,7 +25,7 @@ head:
         with as-test.
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/images/fuzzing-in-assemblyscript-banner.png'
+      content: 'https://blog.jairus.dev/social/fuzzing-in-assemblyscript.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/posts/fuzzing-in-assemblyscript'
@@ -43,7 +45,8 @@ head:
         with as-test.
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/images/fuzzing-in-assemblyscript-banner.png'
+      content: 'https://blog.jairus.dev/social/fuzzing-in-assemblyscript.png'
+socialImage: /social/fuzzing-in-assemblyscript.png
 ---
 
 When I write normal tests, I usually already know which examples I care about.

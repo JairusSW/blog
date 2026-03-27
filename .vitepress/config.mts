@@ -72,8 +72,9 @@ export default defineConfig({
           text: "Posts",
           items: [
             { text: "Archive", link: "/posts/" },
-            { text: "Fuzzing in AssemblyScript", link: "/posts/fuzzing-in-assemblyscript" },
+            { text: "Testing in AssemblyScript", link: "/posts/testing-in-assemblyscript" },
             { text: "Quickly parsing Unicode Escapes with SWAR", link: "/posts/quickly-parsing-unicode-escapes-with-swar" },
+            { text: "Fuzzing in AssemblyScript", link: "/posts/fuzzing-in-assemblyscript" },
           ],
         },
       ],

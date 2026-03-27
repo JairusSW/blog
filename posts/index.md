@@ -30,4 +30,4 @@ head:
     - name: 'twitter:image'
       content: 'https://blog.jairus.dev/social/site.png'
 ---
-<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, run `npm run posts:sync`, and this page updates automatically." />
+<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, and `npm run posts:sync` will assign the next `id`, preserve `createdAt`, and set missing `updatedAt` metadata." />

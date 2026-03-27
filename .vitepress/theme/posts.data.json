@@ -1,28 +1,41 @@
 [
   {
-    "slug": "fuzzing-in-assemblyscript",
-    "title": "Fuzzing in AssemblyScript",
-    "description": "How to add practical property-based fuzzing to an AssemblyScript project with as-test.",
-    "date": "March 26, 2026",
+    "fullPath": "/home/port/Code/blog/posts/testing-in-assemblyscript.md",
+    "slug": "testing-in-assemblyscript",
+    "id": 3,
+    "title": "Testing in AssemblyScript",
+    "description": "A practical guide to setting up tests in AssemblyScript, using snapshots, mocking, fuzzing, and running against real runtimes with as-test.",
+    "createdAt": "March 27, 2026",
+    "createdAtRaw": "2026-03-27",
+    "createdAtSort": 1774612800000,
+    "updatedAt": "March 27, 2026",
+    "updatedAtRaw": "2026-03-27",
+    "updatedAtSort": 1774612800000,
     "category": "Testing",
-    "banner": "/images/fuzzing-in-assemblyscript-banner.png",
-    "bannerAlt": "Abstract banner image for fuzzing in AssemblyScript",
-    "socialImage": "/images/fuzzing-in-assemblyscript-banner.png",
+    "banner": "/images/testing-in-assemblyscript-banner.png",
+    "bannerAlt": "Evergreen trees banner",
+    "socialImage": "/social/testing-in-assemblyscript.png",
     "tags": [
       "testing",
-      "fuzzing",
       "assemblyscript",
-      "webassembly"
+      "webassembly",
+      "performance"
     ],
     "commentCount": 0,
-    "reactionCount": 0,
-    "mtimeMs": 1774558086037.099
+    "reactionCount": 0
   },
   {
+    "fullPath": "/home/port/Code/blog/posts/quickly-parsing-unicode-escapes-with-swar.md",
     "slug": "quickly-parsing-unicode-escapes-with-swar",
+    "id": 2,
     "title": "Quickly parsing Unicode Escapes with SWAR",
     "description": "Parsing JSON unicode escape sequences with SWAR instead of branches or lookup tables.",
-    "date": "March 26, 2026",
+    "createdAt": "March 26, 2026",
+    "createdAtRaw": "2026-03-26",
+    "createdAtSort": 1774526400000,
+    "updatedAt": "March 26, 2026",
+    "updatedAtRaw": "2026-03-26",
+    "updatedAtSort": 1774526400000,
     "category": "Performance",
     "banner": "/images/unicode-escapes-swar-banner.jpg",
     "bannerAlt": "Abstract banner image for unicode parsing post",
@@ -33,7 +46,31 @@
       "assemblyscript"
     ],
     "commentCount": 0,
-    "reactionCount": 0,
-    "mtimeMs": 1774508917224.4775
+    "reactionCount": 0
+  },
+  {
+    "fullPath": "/home/port/Code/blog/posts/fuzzing-in-assemblyscript.md",
+    "slug": "fuzzing-in-assemblyscript",
+    "id": 1,
+    "title": "Fuzzing in AssemblyScript",
+    "description": "How to add practical property-based fuzzing to an AssemblyScript project with as-test.",
+    "createdAt": "March 26, 2026",
+    "createdAtRaw": "2026-03-26",
+    "createdAtSort": 1774526400000,
+    "updatedAt": "March 26, 2026",
+    "updatedAtRaw": "2026-03-26",
+    "updatedAtSort": 1774526400000,
+    "category": "Testing",
+    "banner": "/images/fuzzing-in-assemblyscript-banner.png",
+    "bannerAlt": "Abstract banner image for fuzzing in AssemblyScript",
+    "socialImage": "/social/fuzzing-in-assemblyscript.png",
+    "tags": [
+      "testing",
+      "fuzzing",
+      "assemblyscript",
+      "webassembly"
+    ],
+    "commentCount": 0,
+    "reactionCount": 0
   }
 ]

@@ -48,6 +48,35 @@ function summarize(text, max = 120) {
   return compact.length <= max ? compact : `${compact.slice(0, max - 1).trimEnd()}…`;
 }
 
+function parseFrontmatterDate(value, fieldName, slug) {
+  let raw;
+  if (value instanceof Date) {
+    raw = value.toISOString().slice(0, 10);
+  } else if (typeof value === "string") {
+    raw = value;
+  }
+
+  if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    throw new Error(`Post ${slug} must define ${fieldName} in YYYY-MM-DD format.`);
+  }
+
+  const date = new Date(`${raw}T12:00:00Z`);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Post ${slug} has an invalid ${fieldName}: ${raw}`);
+  }
+
+  return {
+    raw,
+    display: new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      timeZone: "UTC",
+    }).format(date),
+    sortValue: date.getTime(),
+  };
+}
+
 function slugifyTag(tag) {
   return String(tag)
     .trim()
@@ -343,27 +372,54 @@ function renderCard({
   fs.writeFileSync(path.join(socialDir, outputName), png);
 }
 
-const posts = fs.readdirSync(postsDir)
+const postFiles = fs.readdirSync(postsDir)
   .filter((file) => file.endsWith(".md") && file !== "index.md")
-  .map((file) => {
-    const fullPath = path.join(postsDir, file);
-    const stat = fs.statSync(fullPath);
-    const raw = fs.readFileSync(fullPath, "utf8");
-    const parsed = matter(raw);
-    const slug = file.replace(/\.md$/, "");
+  .sort();
+
+const postEntries = postFiles.map((file) => {
+  const fullPath = path.join(postsDir, file);
+  const raw = fs.readFileSync(fullPath, "utf8");
+  const parsed = matter(raw);
+  const slug = file.replace(/\.md$/, "");
+  return { fullPath, file, slug, parsed };
+});
+
+let nextId = postEntries.reduce((maxId, entry) => {
+  const id = Number(entry.parsed.data.id);
+  return Number.isInteger(id) && id > maxId ? id : maxId;
+}, 0) + 1;
+
+const posts = postEntries
+  .map((entry) => {
+    const { fullPath, slug, parsed } = entry;
     const tags = Array.isArray(parsed.data.tags) ? parsed.data.tags.map(String) : [];
     const title = parsed.data.title || slugToTitle(slug);
     const description = parsed.data.description || summarize(parsed.content, 140);
-    const date = parsed.data.date || new Date(stat.mtime).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric"
-    });
+
+    let id = Number(parsed.data.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      id = nextId;
+      nextId += 1;
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const createdSource = parsed.data.createdAt ?? parsed.data.date ?? today;
+    const updatedSource = parsed.data.updatedAt ?? createdSource;
+    const createdAt = parseFrontmatterDate(createdSource, "createdAt", slug);
+    const updatedAt = parseFrontmatterDate(updatedSource, "updatedAt", slug);
+
     return {
+      fullPath,
       slug,
+      id,
       title,
       description,
-      date,
+      createdAt: createdAt.display,
+      createdAtRaw: createdAt.raw,
+      createdAtSort: createdAt.sortValue,
+      updatedAt: updatedAt.display,
+      updatedAtRaw: updatedAt.raw,
+      updatedAtSort: updatedAt.sortValue,
       category: parsed.data.category || "Post",
       banner: parsed.data.banner || "",
       bannerAlt: parsed.data.bannerAlt || "",
@@ -371,10 +427,9 @@ const posts = fs.readdirSync(postsDir)
       tags,
       commentCount: 0,
       reactionCount: 0,
-      mtimeMs: stat.mtimeMs,
     };
   })
-  .sort((a, b) => b.mtimeMs - a.mtimeMs);
+  .sort((a, b) => b.createdAtSort - a.createdAtSort || b.id - a.id || a.slug.localeCompare(b.slug));
 
 try {
   const discussionCounts = await fetchDiscussionCounts(posts);
@@ -406,7 +461,7 @@ for (const post of posts) {
       tags: post.tags,
       eyebrow: post.category || "Post",
       banner: post.banner,
-      date: post.date,
+      date: post.createdAt,
       category: post.category,
       reactionCount: post.reactionCount,
       commentCount: post.commentCount,
@@ -417,8 +472,8 @@ for (const post of posts) {
 
 for (const post of posts) {
   const filePath = path.join(postsDir, `${post.slug}.md`);
-  updateMarkdownFile(filePath, ({ data, content }) => ({
-    data: {
+  updateMarkdownFile(filePath, ({ data, content }) => {
+    const nextData = {
       ...data,
       socialImage: data.socialImage || post.socialImage,
       head: buildHead({
@@ -427,9 +482,16 @@ for (const post of posts) {
         image: absoluteUrl(data.socialImage || post.socialImage),
         url: `${siteUrl}/posts/${post.slug}`,
       }),
-    },
-    content,
-  }));
+      id: post.id,
+      createdAt: post.createdAtRaw,
+      updatedAt: post.updatedAtRaw,
+    };
+    delete nextData.date;
+    return {
+      data: nextData,
+      content,
+    };
+  });
 }
 
 const tagMap = new Map();
@@ -487,7 +549,7 @@ for (const tag of tags) {
 }
 
 const archive = matter.stringify(
-  '<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, run `npm run posts:sync`, and this page updates automatically." />\n',
+  '<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, and `npm run posts:sync` will assign the next `id`, preserve `createdAt`, and set missing `updatedAt` metadata." />\n',
   {
     title: 'Archive',
     description: 'Browse every post on Jairus\' blog.',

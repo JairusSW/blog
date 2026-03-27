@@ -32,7 +32,7 @@ const visiblePosts = computed(() => props.limit ? filteredPosts.value.slice(0, p
         <img v-if="post.banner" class="post-card-banner" :src="post.banner" :alt="post.bannerAlt || post.title" loading="lazy" />
         <div v-else class="post-card-banner post-card-banner-placeholder" aria-hidden="true"></div>
         <div class="post-card-body">
-          <span class="post-meta">{{ post.date }} · {{ post.category }}</span>
+          <span class="post-meta">{{ post.createdAt }} · {{ post.category }}</span>
           <strong>{{ post.title }}</strong>
           <p>{{ post.description }}</p>
           <div class="post-card-footer">
