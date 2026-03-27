@@ -12,7 +12,7 @@ tags:
   - fuzzing
   - assemblyscript
   - webassembly
-banner: /images/fuzzing-in-assemblyscript-banner.png
+banner: /images/fuzzing-in-assemblyscript-banner-v2.png
 bannerAlt: Abstract banner image for fuzzing in AssemblyScript
 head:
   - - meta

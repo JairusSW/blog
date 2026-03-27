@@ -46,7 +46,7 @@
       "assemblyscript"
     ],
     "commentCount": 0,
-    "reactionCount": 0
+    "reactionCount": 1
   },
   {
     "fullPath": "/home/port/Code/blog/posts/fuzzing-in-assemblyscript.md",
@@ -61,7 +61,7 @@
     "updatedAtRaw": "2026-03-26",
     "updatedAtSort": 1774526400000,
     "category": "Testing",
-    "banner": "/images/fuzzing-in-assemblyscript-banner.png",
+    "banner": "/images/fuzzing-in-assemblyscript-banner-v2.png",
     "bannerAlt": "Abstract banner image for fuzzing in AssemblyScript",
     "socialImage": "/social/fuzzing-in-assemblyscript.png",
     "tags": [
@@ -71,6 +71,6 @@
       "webassembly"
     ],
     "commentCount": 0,
-    "reactionCount": 0
+    "reactionCount": 1
   }
 ]
