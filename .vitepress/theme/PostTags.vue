@@ -3,9 +3,12 @@ import { computed } from "vue";
 import { useData } from "vitepress";
 import { tagStyle } from "./tagStyles";
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   tags?: string[];
-}>();
+  links?: boolean;
+}>(), {
+  links: true,
+});
 
 const { theme } = useData();
 const tagColors = computed(() => theme.value.tagColors ?? {});
@@ -16,15 +19,16 @@ function tagSlug(tag: string) {
 </script>
 
 <template>
-  <div v-if="tags?.length" class="post-tags">
-    <a
-      v-for="tag in tags"
+  <div v-if="props.tags?.length" class="post-tags">
+    <component
+      v-for="tag in props.tags"
       :key="tag"
       class="post-tag"
-      :href="`/tags/${tagSlug(tag)}`"
+      :is="props.links === false ? 'span' : 'a'"
+      :href="props.links === false ? undefined : `/tags/${tagSlug(tag)}`"
       :style="tagStyle(tag, tagColors)"
     >
       {{ tag }}
-    </a>
+    </component>
   </div>
 </template>

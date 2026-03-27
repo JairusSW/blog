@@ -44,7 +44,7 @@ function bannerWithVersion(post: { banner?: string; updatedAtRaw?: string; creat
           <strong>{{ post.title }}</strong>
           <p>{{ post.description }}</p>
           <div class="post-card-footer">
-            <PostTags :tags="post.tags" />
+            <PostTags :tags="post.tags" :links="false" />
             <div class="post-stats">
               <span>{{ post.reactionCount || 0 }} reactions</span>
               <span>{{ post.commentCount || 0 }} comments</span>
