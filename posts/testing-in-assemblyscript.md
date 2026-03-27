@@ -177,7 +177,7 @@ import { decode, encode } from "../codec";
 
 fuzz("string round-trip", (value: string): void => {
   expect(decode(encode(value))).toBe(value);
-}).generate((seed: FuzzSeed, run: (value: string) => void): void => {
+}, 10_000).generate((seed: FuzzSeed, run: (value: string) => void): void => {
   run(seed.string({ min: 0, max: 64 }));
 });
 ```
