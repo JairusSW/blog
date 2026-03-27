@@ -18,6 +18,14 @@ const filteredPosts = computed(() => normalizedTag.value
   ? posts.filter((post) => (post.tags || []).some((tag) => tag.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") === normalizedTag.value))
   : posts);
 const visiblePosts = computed(() => props.limit ? filteredPosts.value.slice(0, props.limit) : filteredPosts.value);
+
+function bannerWithVersion(post: { banner?: string; updatedAtRaw?: string; createdAtRaw?: string }) {
+  if (!post.banner) return "";
+  const version = post.updatedAtRaw || post.createdAtRaw;
+  if (!version) return post.banner;
+  const separator = post.banner.includes("?") ? "&" : "?";
+  return `${post.banner}${separator}v=${encodeURIComponent(version)}`;
+}
 </script>
 
 <template>
@@ -29,7 +37,7 @@ const visiblePosts = computed(() => props.limit ? filteredPosts.value.slice(0, p
 
     <div class="post-collection-grid">
       <a v-for="post in visiblePosts" :key="post.slug" class="post-card" :href="`/posts/${post.slug}`">
-        <img v-if="post.banner" class="post-card-banner" :src="post.banner" :alt="post.bannerAlt || post.title" loading="lazy" />
+        <img v-if="post.banner" class="post-card-banner" :src="bannerWithVersion(post)" :alt="post.bannerAlt || post.title" loading="lazy" />
         <div v-else class="post-card-banner post-card-banner-placeholder" aria-hidden="true"></div>
         <div class="post-card-body">
           <span class="post-meta">{{ post.createdAt }} · {{ post.category }}</span>
