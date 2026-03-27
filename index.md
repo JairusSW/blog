@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Read the latest
-      link: /posts/fuzzing-in-assemblyscript
+      link: /posts/testing-in-assemblyscript
     - theme: alt
       text: Browse archive
       link: /posts/

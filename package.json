@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "blog:dev": "vitepress dev .",
-    "blog:build": "vitepress build .",
+    "blog:build": "npm run posts:sync && vitepress build .",
     "blog:preview": "vitepress preview .",
     "posts:sync": "node scripts/sync-posts.mjs",
     "social:check": "node scripts/check-social.mjs",
