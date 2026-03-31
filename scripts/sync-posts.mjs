@@ -281,7 +281,7 @@ function resolveTagPalette(tag) {
     const rgb = hexToRgb(override);
     if (rgb) {
       return {
-        background: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`,
+        background: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.26)`,
         text: "rgb(248, 250, 252)",
       };
     }
@@ -434,10 +434,6 @@ async function renderCard(
         <stop stop-color="hsla(${hue}, 70%, 28%, 0.96)"/>
         <stop offset="1" stop-color="#1b2940"/>
       </linearGradient>
-      <linearGradient id="banner-overlay" x1="0" y1="0" x2="0" y2="1">
-        <stop stop-color="rgba(7,17,26,0.04)"/>
-        <stop offset="1" stop-color="rgba(7,17,26,0.34)"/>
-      </linearGradient>
       <linearGradient id="bottom-fade" x1="0" y1="0" x2="0" y2="1">
         <stop stop-color="rgba(8,15,24,0)"/>
         <stop offset="1" stop-color="rgba(8,15,24,0.5)"/>
@@ -475,7 +471,6 @@ async function renderCard(
             ? `<image href="${bannerImage}" x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" preserveAspectRatio="xMidYMid slice"/>`
             : `<rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" fill="url(#banner-fallback)"/>`
         }
-        <rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" fill="url(#banner-overlay)"/>
       </g>
       ${tagsSvg}
       ${
