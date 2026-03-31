@@ -96,10 +96,10 @@ If I can classify four UTF-16 lanes at once inside one `u64`, then the common ca
 2. compute a mask
 3. copy directly if the mask is zero
 
-That is the whole job of this helper:
+That is the whole job of this helper written in the [AssemblyScript Language](https://assemblyscript.org/)
 
 ```ts
-@inline export function detect_escapable_u64_swar_safe(block: u64): u64 {
+@inline function detect_escapable_u64_swar_safe(block: u64): u64 {
   const lo = block & 0x00ff_00ff_00ff_00ff;
   const ascii_mask =
     ((lo - 0x0020_0020_0020_0020)
@@ -306,16 +306,6 @@ The unsafe detector compiles to a smaller body because it skips the extra high-b
 There is nothing magical there. The unsafe version is just doing less work.
 
 That is why I like this optimization. It is not a “benchmark trick” in the bad sense. The source is smaller, the emitted code is smaller, and the measured throughput moves in the same direction.
-
-## The broader lesson
-
-The interesting part of this pattern is not really the specific constants.
-
-It is that the serializer stops paying per-character decision cost for the common case.
-
-Most string data is uneventful, so the fast path should be optimized around proving “nothing interesting happened” as cheaply as possible.
-
-SWAR gives a neat way to do exactly that for UTF-16 string data.
 
 If you want to see the real implementation in context, these are the relevant `json-as` sources:
 
