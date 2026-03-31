@@ -1,8 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
 import matter from "gray-matter";
 import { Resvg } from "@resvg/resvg-js";
+import sharp from "sharp";
 
 const root = process.cwd();
 const siteUrl = "https://blog.jairus.dev";
@@ -310,49 +310,53 @@ function formatCountLabel(count, noun) {
 function compressSocialPng(filePath) {
   const originalSize = fs.statSync(filePath).size;
   if (originalSize <= socialImageMaxBytes) {
-    return originalSize;
+    return Promise.resolve(originalSize);
   }
 
   const attempts = [
-    ["32", "96"],
-    ["64", "88"],
-    ["96", "84"],
-    ["128", "82"],
+    { colors: 32, quality: 96 },
+    { colors: 48, quality: 92 },
+    { colors: 64, quality: 88 },
+    { colors: 96, quality: 84 },
+    { colors: 128, quality: 82 },
   ];
 
   let bestSize = originalSize;
   let bestBuffer = fs.readFileSync(filePath);
 
-  for (const [colors, quality] of attempts) {
-    const output = execFileSync("convert", [
-      filePath,
-      "-strip",
-      "-colors", colors,
-      "-define", "png:compression-level=9",
-      "-define", "png:compression-strategy=1",
-      "-quality", quality,
-      "png8:-",
-    ], {
-      encoding: "buffer",
-      stdio: ["ignore", "pipe", "inherit"],
+  return sharp(filePath)
+    .png()
+    .toBuffer()
+    .then(async (sourceBuffer) => {
+      for (const { colors, quality } of attempts) {
+        const output = await sharp(sourceBuffer)
+          .png({
+            compressionLevel: 9,
+            progressive: false,
+            palette: true,
+            quality,
+            colours: colors,
+            effort: 10,
+          })
+          .toBuffer();
+
+        if (output.length < bestSize) {
+          bestSize = output.length;
+          bestBuffer = output;
+        }
+
+        if (output.length <= socialImageMaxBytes) {
+          fs.writeFileSync(filePath, output);
+          return output.length;
+        }
+      }
+
+      fs.writeFileSync(filePath, bestBuffer);
+      return bestSize;
     });
-
-    if (output.length < bestSize) {
-      bestSize = output.length;
-      bestBuffer = output;
-    }
-
-    if (output.length <= socialImageMaxBytes) {
-      fs.writeFileSync(filePath, output);
-      return output.length;
-    }
-  }
-
-  fs.writeFileSync(filePath, bestBuffer);
-  return bestSize;
 }
 
-function renderCard({
+async function renderCard({
   title,
   tags = [],
   eyebrow = "Jairus' Blog",
@@ -460,7 +464,7 @@ function renderCard({
   const png = resvg.render().asPng();
   const outputPath = path.join(socialDir, outputName);
   fs.writeFileSync(outputPath, png);
-  const finalSize = compressSocialPng(outputPath);
+  const finalSize = await compressSocialPng(outputPath);
   if (finalSize > socialImageMaxBytes) {
     throw new Error(`Social image ${outputName} exceeds 600 KB after compression (${finalSize} bytes).`);
   }
@@ -538,7 +542,7 @@ try {
 }
 
 for (const post of posts) {
-  renderCard(
+  await renderCard(
     {
       title: post.title,
       tags: post.tags,
