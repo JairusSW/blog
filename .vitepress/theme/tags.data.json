@@ -2,7 +2,7 @@
   {
     "slug": "assemblyscript",
     "name": "assemblyscript",
-    "count": 3
+    "count": 4
   },
   {
     "slug": "fuzzing",
@@ -12,12 +12,12 @@
   {
     "slug": "performance",
     "name": "performance",
-    "count": 2
+    "count": 3
   },
   {
     "slug": "swar",
     "name": "swar",
-    "count": 1
+    "count": 2
   },
   {
     "slug": "testing",

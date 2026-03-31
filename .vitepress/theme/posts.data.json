@@ -1,5 +1,29 @@
 [
   {
+    "fullPath": "/home/port/Code/blog/posts/quickly-detecting-escape-sequences-with-swar.md",
+    "slug": "quickly-detecting-escape-sequences-with-swar",
+    "id": 4,
+    "title": "Quickly detecting Escape Sequences with SWAR",
+    "description": "A compact SWAR trick for detecting quotes, backslashes, control characters, and non-ASCII UTF-16 lanes while serializing JSON strings.",
+    "createdAt": "March 30, 2026",
+    "createdAtRaw": "2026-03-30",
+    "createdAtSort": 1774872000000,
+    "updatedAt": "March 30, 2026",
+    "updatedAtRaw": "2026-03-30",
+    "updatedAtSort": 1774872000000,
+    "category": "Performance",
+    "banner": "",
+    "bannerAlt": "",
+    "socialImage": "/social/quickly-detecting-escape-sequences-with-swar.png",
+    "tags": [
+      "performance",
+      "swar",
+      "assemblyscript"
+    ],
+    "commentCount": 0,
+    "reactionCount": 0
+  },
+  {
     "fullPath": "/home/port/Code/blog/posts/testing-in-assemblyscript.md",
     "slug": "testing-in-assemblyscript",
     "id": 3,

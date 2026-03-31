@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import posts from "./posts.data.json";
 import PostTags from "./PostTags.vue";
+import ViewCount from "./ViewCount.vue";
 
 const props = withDefaults(defineProps<{
   limit?: number;
@@ -46,6 +47,7 @@ function bannerWithVersion(post: { banner?: string; updatedAtRaw?: string; creat
           <div class="post-card-footer">
             <PostTags :tags="post.tags" :links="false" />
             <div class="post-stats">
+              <ViewCount :slug="post.slug" />
               <span>{{ post.reactionCount || 0 }} reactions</span>
               <span>{{ post.commentCount || 0 }} comments</span>
             </div>

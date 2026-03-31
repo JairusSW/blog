@@ -1,0 +1,12 @@
+{
+  "name": "c-and-wasm-benchmark",
+  "private": true,
+  "scripts": {
+    "build:wasm": "npx asc wasm-bench.ts -O3 --converge --noAssert --uncheckedBehavior always --runtime incremental --config ./node_modules/@assemblyscript/wasi-shim/asconfig.json -o build/wasm-bench.wasm",
+    "run:wasm:wasmer": "wasmer run --llvm --enable-pass-params-opt build/wasm-bench.wasm"
+  },
+  "devDependencies": {
+    "@assemblyscript/wasi-shim": "^0.1.0",
+    "assemblyscript": "^0.28.9"
+  }
+}

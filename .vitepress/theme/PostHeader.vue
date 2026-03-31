@@ -2,11 +2,16 @@
 import { computed } from "vue";
 import { useData } from "vitepress";
 import PostTags from "./PostTags.vue";
+import ViewCount from "./ViewCount.vue";
 
 const { frontmatter, page } = useData();
 const isPost = computed(() => {
   const path = page.value.relativePath || "";
   return path.startsWith("posts/") && path !== "posts/index.md";
+});
+const slug = computed(() => {
+  const path = page.value.relativePath || "";
+  return path.replace(/^posts\//, "").replace(/\.md$/, "");
 });
 const title = computed(() => frontmatter.value.title as string | undefined);
 const description = computed(() => frontmatter.value.description as string | undefined);
@@ -25,6 +30,9 @@ const metaLine = computed(() => {
   <header v-if="isPost && title" class="post-header">
     <h1>{{ title }}</h1>
     <p v-if="metaLine" class="post-meta">{{ metaLine }}</p>
+    <div class="post-stats post-header-stats">
+      <ViewCount :slug="slug" increment />
+    </div>
     <p v-if="description" class="post-header-description">{{ description }}</p>
     <PostTags :tags="tags" />
   </header>
