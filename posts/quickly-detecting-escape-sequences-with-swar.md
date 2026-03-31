@@ -10,6 +10,7 @@ tags:
   - assemblyscript
 createdAt: '2026-03-30'
 updatedAt: '2026-03-30'
+banner: /images/quickly-detecting-escape-sequences-with-swar.png
 socialImage: /social/quickly-detecting-escape-sequences-with-swar.png
 head:
   - - meta
