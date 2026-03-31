@@ -10,7 +10,7 @@ head:
       content: Browse posts by topic on Jairus' blog.
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/tags/'
@@ -28,7 +28,7 @@ head:
       content: Browse posts by topic on Jairus' blog.
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
 ---
 # Tags
 

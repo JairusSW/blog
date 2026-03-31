@@ -10,7 +10,7 @@ head:
       content: Browse every post on Jairus' blog.
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/posts/'
@@ -28,6 +28,6 @@ head:
       content: Browse every post on Jairus' blog.
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
 ---
 <PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, and `npm run posts:sync` will assign the next `id`, preserve `createdAt`, and set missing `updatedAt` metadata." />

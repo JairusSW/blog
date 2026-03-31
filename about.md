@@ -10,7 +10,7 @@ head:
       content: About Jairus Tanaka and the work behind this blog.
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/about'
@@ -28,7 +28,7 @@ head:
       content: About Jairus Tanaka and the work behind this blog.
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
 ---
 # About
 

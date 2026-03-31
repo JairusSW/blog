@@ -10,7 +10,7 @@ head:
       content: Posts filed under performance.
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/tags/performance'
@@ -28,6 +28,6 @@ head:
       content: Posts filed under performance.
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
 ---
 <PostCards tag="performance" title="Tagged: performance" intro="Posts filed under performance." />

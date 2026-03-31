@@ -10,7 +10,7 @@ head:
       content: Posts filed under fuzzing.
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/tags/fuzzing'
@@ -28,6 +28,6 @@ head:
       content: Posts filed under fuzzing.
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
 ---
 <PostCards tag="fuzzing" title="Tagged: fuzzing" intro="Posts filed under fuzzing." />

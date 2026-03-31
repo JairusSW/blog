@@ -1,11 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execFileSync } from "node:child_process";
 import matter from "gray-matter";
 import { Resvg } from "@resvg/resvg-js";
 
 const root = process.cwd();
 const siteUrl = "https://blog.jairus.dev";
-const defaultSocialImage = "/social/site.png";
+const defaultSocialImage = "/logo.png";
 const githubToken = process.env.GH_DISCUSSIONS_TOKEN || process.env.GITHUB_TOKEN || "";
 const githubRepoOwner = "JairusSW";
 const githubRepoName = "blog";
@@ -13,6 +14,7 @@ const postsDir = path.join(root, "posts");
 const tagsDir = path.join(root, "tags");
 const socialDir = path.join(root, "public", "social");
 const socialFontDir = path.join(root, ".vitepress", "theme", "fonts");
+const socialImageMaxBytes = 600 * 1024;
 const dataPath = path.join(root, ".vitepress", "theme", "posts.data.json");
 const tagsDataPath = path.join(root, ".vitepress", "theme", "tags.data.json");
 const configPath = path.join(root, ".vitepress", "config.mts");
@@ -305,6 +307,51 @@ function formatCountLabel(count, noun) {
   return `${count} ${noun}${count === 1 ? "" : "s"}`;
 }
 
+function compressSocialPng(filePath) {
+  const originalSize = fs.statSync(filePath).size;
+  if (originalSize <= socialImageMaxBytes) {
+    return originalSize;
+  }
+
+  const attempts = [
+    ["32", "96"],
+    ["64", "88"],
+    ["96", "84"],
+    ["128", "82"],
+  ];
+
+  let bestSize = originalSize;
+  let bestBuffer = fs.readFileSync(filePath);
+
+  for (const [colors, quality] of attempts) {
+    const output = execFileSync("convert", [
+      filePath,
+      "-strip",
+      "-colors", colors,
+      "-define", "png:compression-level=9",
+      "-define", "png:compression-strategy=1",
+      "-quality", quality,
+      "png8:-",
+    ], {
+      encoding: "buffer",
+      stdio: ["ignore", "pipe", "inherit"],
+    });
+
+    if (output.length < bestSize) {
+      bestSize = output.length;
+      bestBuffer = output;
+    }
+
+    if (output.length <= socialImageMaxBytes) {
+      fs.writeFileSync(filePath, output);
+      return output.length;
+    }
+  }
+
+  fs.writeFileSync(filePath, bestBuffer);
+  return bestSize;
+}
+
 function renderCard({
   title,
   tags = [],
@@ -411,7 +458,12 @@ function renderCard({
     },
   });
   const png = resvg.render().asPng();
-  fs.writeFileSync(path.join(socialDir, outputName), png);
+  const outputPath = path.join(socialDir, outputName);
+  fs.writeFileSync(outputPath, png);
+  const finalSize = compressSocialPng(outputPath);
+  if (finalSize > socialImageMaxBytes) {
+    throw new Error(`Social image ${outputName} exceeds 600 KB after compression (${finalSize} bytes).`);
+  }
 }
 
 const postFiles = fs.readdirSync(postsDir)
@@ -484,15 +536,6 @@ try {
 } catch (error) {
   console.warn(`Unable to fetch GitHub discussion counts: ${error.message}`);
 }
-
-renderCard(
-  {
-    title: "Jairus' Blog",
-    tags: ["assemblyscript", "tooling", "performance"],
-    eyebrow: "Jairus' Blog",
-  },
-  "site.png"
-);
 
 for (const post of posts) {
   renderCard(

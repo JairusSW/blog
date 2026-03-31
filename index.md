@@ -37,7 +37,7 @@ head:
       content: 'Build notes, release notes, and opinions with receipts.'
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/'
@@ -55,7 +55,7 @@ head:
       content: 'Build notes, release notes, and opinions with receipts.'
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
 ---
 
 <PostCards

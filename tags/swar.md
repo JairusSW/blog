@@ -10,7 +10,7 @@ head:
       content: Posts filed under swar.
   - - meta
     - property: 'og:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
   - - meta
     - property: 'og:url'
       content: 'https://blog.jairus.dev/tags/swar'
@@ -28,6 +28,6 @@ head:
       content: Posts filed under swar.
   - - meta
     - name: 'twitter:image'
-      content: 'https://blog.jairus.dev/social/site.png'
+      content: 'https://blog.jairus.dev/logo.png'
 ---
 <PostCards tag="swar" title="Tagged: swar" intro="Posts filed under swar." />
