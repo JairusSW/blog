@@ -7,7 +7,8 @@ import sharp from "sharp";
 const root = process.cwd();
 const siteUrl = "https://blog.jairus.dev";
 const defaultSocialImage = "/logo.png";
-const githubToken = process.env.GH_DISCUSSIONS_TOKEN || process.env.GITHUB_TOKEN || "";
+const githubToken =
+  process.env.GH_DISCUSSIONS_TOKEN || process.env.GITHUB_TOKEN || "";
 const githubRepoOwner = "JairusSW";
 const githubRepoName = "blog";
 const postsDir = path.join(root, "posts");
@@ -15,6 +16,8 @@ const tagsDir = path.join(root, "tags");
 const socialDir = path.join(root, "public", "social");
 const socialFontDir = path.join(root, ".vitepress", "theme", "fonts");
 const socialImageMaxBytes = 600 * 1024;
+const vpDividerDark = { r: 46, g: 46, b: 50 };
+const white = { r: 255, g: 255, b: 255 };
 const dataPath = path.join(root, ".vitepress", "theme", "posts.data.json");
 const tagsDataPath = path.join(root, ".vitepress", "theme", "tags.data.json");
 const configPath = path.join(root, ".vitepress", "config.mts");
@@ -43,13 +46,15 @@ fs.mkdirSync(socialFontDir, { recursive: true });
 function slugToTitle(slug) {
   return slug
     .split("-")
-    .map((part) => part ? part[0].toUpperCase() + part.slice(1) : part)
+    .map((part) => (part ? part[0].toUpperCase() + part.slice(1) : part))
     .join(" ");
 }
 
 function summarize(text, max = 120) {
   const compact = text.replace(/\s+/g, " ").trim();
-  return compact.length <= max ? compact : `${compact.slice(0, max - 1).trimEnd()}…`;
+  return compact.length <= max
+    ? compact
+    : `${compact.slice(0, max - 1).trimEnd()}…`;
 }
 
 function parseFrontmatterDate(value, fieldName, slug) {
@@ -61,7 +66,9 @@ function parseFrontmatterDate(value, fieldName, slug) {
   }
 
   if (!raw || !/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
-    throw new Error(`Post ${slug} must define ${fieldName} in YYYY-MM-DD format.`);
+    throw new Error(
+      `Post ${slug} must define ${fieldName} in YYYY-MM-DD format.`,
+    );
   }
 
   const date = new Date(`${raw}T12:00:00Z`);
@@ -148,12 +155,16 @@ async function fetchDiscussionCounts(posts) {
     });
 
     if (!response.ok) {
-      throw new Error(`GitHub GraphQL request failed: ${response.status} ${response.statusText}`);
+      throw new Error(
+        `GitHub GraphQL request failed: ${response.status} ${response.statusText}`,
+      );
     }
 
     const payload = await response.json();
     if (payload.errors?.length) {
-      throw new Error(`GitHub GraphQL error: ${payload.errors.map((error) => error.message).join("; ")}`);
+      throw new Error(
+        `GitHub GraphQL error: ${payload.errors.map((error) => error.message).join("; ")}`,
+      );
     }
 
     const connection = payload.data?.repository?.discussions;
@@ -229,7 +240,7 @@ function wrapLines(text, maxChars) {
 function colorFromString(input) {
   let hash = 0;
   for (let i = 0; i < input.length; i += 1) {
-    hash = ((hash << 5) - hash) + input.charCodeAt(i);
+    hash = (hash << 5) - hash + input.charCodeAt(i);
     hash |= 0;
   }
   return Math.abs(hash) % 360;
@@ -237,9 +248,13 @@ function colorFromString(input) {
 
 function hexToRgb(hex) {
   const normalized = hex.replace("#", "").trim();
-  const value = normalized.length === 3
-    ? normalized.split("").map((part) => part + part).join("")
-    : normalized;
+  const value =
+    normalized.length === 3
+      ? normalized
+          .split("")
+          .map((part) => part + part)
+          .join("")
+      : normalized;
 
   if (!/^[0-9a-fA-F]{6}$/.test(value)) return null;
 
@@ -250,24 +265,32 @@ function hexToRgb(hex) {
   };
 }
 
-function resolveTagPalette(tag, index, baseHue) {
-  const override = tagColorOverrides[String(tag).toLowerCase()];
+function mixRgb(a, b, weightA) {
+  const weightB = 1 - weightA;
+  return {
+    r: Math.round(a.r * weightA + b.r * weightB),
+    g: Math.round(a.g * weightA + b.g * weightB),
+    b: Math.round(a.b * weightA + b.b * weightB),
+  };
+}
+
+function resolveTagPalette(tag) {
+  const key = String(tag).toLowerCase();
+  const override = tagColorOverrides[key];
   if (override) {
     const rgb = hexToRgb(override);
     if (rgb) {
       return {
-        background: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.16)`,
-        border: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.42)`,
-        text: `rgb(${Math.round(rgb.r + (255 - rgb.r) * 0.26)}, ${Math.round(rgb.g + (255 - rgb.g) * 0.26)}, ${Math.round(rgb.b + (255 - rgb.b) * 0.26)})`,
+        background: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.3)`,
+        text: "rgb(248, 250, 252)",
       };
     }
   }
 
-  const hue = (baseHue + index * 28) % 360;
+  const hue = colorFromString(key);
   return {
     background: `hsla(${hue}, 78%, 52%, 0.12)`,
-    border: `hsla(${hue}, 78%, 52%, 0.32)`,
-    text: `hsl(${hue}, 88%, 78%)`,
+    text: "rgb(248, 250, 252)",
   };
 }
 
@@ -279,28 +302,31 @@ function getImageDataUri(input) {
   if (!fs.existsSync(filePath)) return "";
 
   const extension = path.extname(filePath).toLowerCase();
-  const mimeType = extension === ".png"
-    ? "image/png"
-    : extension === ".webp"
-      ? "image/webp"
-      : "image/jpeg";
+  const mimeType =
+    extension === ".png"
+      ? "image/png"
+      : extension === ".webp"
+        ? "image/webp"
+        : "image/jpeg";
 
   return `data:${mimeType};base64,${fs.readFileSync(filePath).toString("base64")}`;
 }
 
-
-function renderTagPills(tags, baseHue, startX, y) {
+function renderTagPills(tags, startX, y) {
   let offsetX = startX;
-  return tags.slice(0, 4).map((tag, index) => {
-    const width = Math.max(112, 40 + tag.length * 13);
-    const x = offsetX;
-    offsetX += width + 14;
-    const palette = resolveTagPalette(tag, index, baseHue);
-    return `
-      <rect x="${x}" y="${y}" width="${width}" height="44" rx="22" fill="${palette.background}" stroke="${palette.border}"/>
+  return tags
+    .slice(0, 4)
+    .map((tag, index) => {
+      const width = Math.max(112, 40 + tag.length * 13);
+      const x = offsetX;
+      offsetX += width + 14;
+      const palette = resolveTagPalette(tag);
+      return `
+      <rect x="${x}" y="${y}" width="${width}" height="44" rx="22" fill="${palette.background}"/>
       <text x="${x + width / 2}" y="${y + 24}" fill="${palette.text}" font-size="20" font-family="League Spartan" font-weight="600" text-anchor="middle" dominant-baseline="middle">${escapeXml(tag)}</text>
     `;
-  }).join("");
+    })
+    .join("");
 }
 
 function formatCountLabel(count, noun) {
@@ -356,16 +382,19 @@ function compressSocialPng(filePath) {
     });
 }
 
-async function renderCard({
-  title,
-  tags = [],
-  eyebrow = "Jairus' Blog",
-  banner = "",
-  date = "",
-  category = "",
-  reactionCount = 0,
-  commentCount = 0,
-}, outputName) {
+async function renderCard(
+  {
+    title,
+    tags = [],
+    eyebrow = "Jairus' Blog",
+    banner = "",
+    date = "",
+    category = "",
+    reactionCount = 0,
+    commentCount = 0,
+  },
+  outputName,
+) {
   const hue = colorFromString(`${title}${category}${eyebrow}`);
   const titleLines = wrapLines(title, 24).slice(0, 3);
   const bannerImage = getImageDataUri(banner);
@@ -373,9 +402,10 @@ async function renderCard({
   const cardHeight = 630;
   const meta = [date, category].filter(Boolean).join(" · ");
   const metaLabel = meta || eyebrow;
-  const statsLabel = reactionCount || commentCount
-    ? `${formatCountLabel(reactionCount, "reaction")}   ${formatCountLabel(commentCount, "comment")}`
-    : "";
+  const statsLabel =
+    reactionCount || commentCount
+      ? `${formatCountLabel(reactionCount, "reaction")}   ${formatCountLabel(commentCount, "comment")}`
+      : "";
   const framePad = 0;
   const bodyX = 52;
   const bannerX = framePad;
@@ -386,7 +416,7 @@ async function renderCard({
   const titleY = metaY + 72;
   const titleLineHeight = 68;
   const footerY = cardHeight - 60;
-  const tagsSvg = renderTagPills(tags, hue, bodyX, footerY);
+  const tagsSvg = renderTagPills(tags, bodyX, footerY);
 
   const svg = `
   <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -440,16 +470,18 @@ async function renderCard({
     ${titleLines.map((line, index) => `<text x="${bodyX}" y="${titleY + index * titleLineHeight}" fill="#F8FAFC" font-size="62" font-family="League Spartan" font-weight="700">${escapeXml(line)}</text>`).join("")}
     <rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" rx="26" fill="rgba(15,23,42,0.44)" stroke="rgba(148,163,184,0.14)"/>
       <g clip-path="url(#banner-clip)">
-        ${bannerImage
-          ? `<image href="${bannerImage}" x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" preserveAspectRatio="xMidYMid slice"/>`
-          : `<rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" fill="url(#banner-fallback)"/>`
+        ${
+          bannerImage
+            ? `<image href="${bannerImage}" x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" preserveAspectRatio="xMidYMid slice"/>`
+            : `<rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" fill="url(#banner-fallback)"/>`
         }
         <rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" fill="url(#banner-overlay)"/>
       </g>
       ${tagsSvg}
-      ${statsLabel
-        ? `<text x="${bodyX}" y="${footerY - 28}" fill="#94A3B8" font-size="24" font-family="League Spartan" font-weight="500">${escapeXml(statsLabel)}</text>`
-        : ""
+      ${
+        statsLabel
+          ? `<text x="${bodyX}" y="${footerY - 28}" fill="#94A3B8" font-size="24" font-family="League Spartan" font-weight="500">${escapeXml(statsLabel)}</text>`
+          : ""
       }
   </svg>`;
 
@@ -466,11 +498,14 @@ async function renderCard({
   fs.writeFileSync(outputPath, png);
   const finalSize = await compressSocialPng(outputPath);
   if (finalSize > socialImageMaxBytes) {
-    throw new Error(`Social image ${outputName} exceeds 600 KB after compression (${finalSize} bytes).`);
+    throw new Error(
+      `Social image ${outputName} exceeds 600 KB after compression (${finalSize} bytes).`,
+    );
   }
 }
 
-const postFiles = fs.readdirSync(postsDir)
+const postFiles = fs
+  .readdirSync(postsDir)
   .filter((file) => file.endsWith(".md") && file !== "index.md")
   .sort();
 
@@ -482,17 +517,21 @@ const postEntries = postFiles.map((file) => {
   return { fullPath, file, slug, parsed };
 });
 
-let nextId = postEntries.reduce((maxId, entry) => {
-  const id = Number(entry.parsed.data.id);
-  return Number.isInteger(id) && id > maxId ? id : maxId;
-}, 0) + 1;
+let nextId =
+  postEntries.reduce((maxId, entry) => {
+    const id = Number(entry.parsed.data.id);
+    return Number.isInteger(id) && id > maxId ? id : maxId;
+  }, 0) + 1;
 
 const posts = postEntries
   .map((entry) => {
     const { fullPath, slug, parsed } = entry;
-    const tags = Array.isArray(parsed.data.tags) ? parsed.data.tags.map(String) : [];
+    const tags = Array.isArray(parsed.data.tags)
+      ? parsed.data.tags.map(String)
+      : [];
     const title = parsed.data.title || slugToTitle(slug);
-    const description = parsed.data.description || summarize(parsed.content, 140);
+    const description =
+      parsed.data.description || summarize(parsed.content, 140);
 
     let id = Number(parsed.data.id);
     if (!Number.isInteger(id) || id <= 0) {
@@ -527,7 +566,12 @@ const posts = postEntries
       reactionCount: 0,
     };
   })
-  .sort((a, b) => b.createdAtSort - a.createdAtSort || b.id - a.id || a.slug.localeCompare(b.slug));
+  .sort(
+    (a, b) =>
+      b.createdAtSort - a.createdAtSort ||
+      b.id - a.id ||
+      a.slug.localeCompare(b.slug),
+  );
 
 try {
   const discussionCounts = await fetchDiscussionCounts(posts);
@@ -553,7 +597,7 @@ for (const post of posts) {
       reactionCount: post.reactionCount,
       commentCount: post.commentCount,
     },
-    `${post.slug}.png`
+    `${post.slug}.png`,
   );
 }
 
@@ -602,20 +646,20 @@ for (const entry of fs.readdirSync(tagsDir)) {
 }
 
 const tagsIndex = matter.stringify(
-  '# Tags\n\nBrowse posts by topic.\n\n<TagDirectory />\n',
+  "# Tags\n\nBrowse posts by topic.\n\n<TagDirectory />\n",
   {
-    title: 'Tags',
-    description: 'Browse posts by topic on Jairus\' blog.',
+    title: "Tags",
+    description: "Browse posts by topic on Jairus' blog.",
     head: buildHead({
-      title: 'Tags | Jairus\' Blog',
-      description: 'Browse posts by topic on Jairus\' blog.',
+      title: "Tags | Jairus' Blog",
+      description: "Browse posts by topic on Jairus' blog.",
       image: absoluteUrl(defaultSocialImage),
       url: `${siteUrl}/tags/`,
-      type: 'website',
+      type: "website",
     }),
-  }
+  },
 );
-fs.writeFileSync(path.join(tagsDir, 'index.md'), tagsIndex);
+fs.writeFileSync(path.join(tagsDir, "index.md"), tagsIndex);
 
 for (const tag of tags) {
   const content = matter.stringify(
@@ -628,9 +672,9 @@ for (const tag of tags) {
         description: `Posts filed under ${tag.name}.`,
         image: absoluteUrl(defaultSocialImage),
         url: `${siteUrl}/tags/${tag.slug}`,
-        type: 'website',
+        type: "website",
       }),
-    }
+    },
   );
   fs.writeFileSync(path.join(tagsDir, `${tag.slug}.md`), content);
 }
@@ -638,35 +682,41 @@ for (const tag of tags) {
 const archive = matter.stringify(
   '<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, and `npm run posts:sync` will assign the next `id`, preserve `createdAt`, and set missing `updatedAt` metadata." />\n',
   {
-    title: 'Archive',
-    description: 'Browse every post on Jairus\' blog.',
+    title: "Archive",
+    description: "Browse every post on Jairus' blog.",
     head: buildHead({
-      title: 'Archive | Jairus\' Blog',
-      description: 'Browse every post on Jairus\' blog.',
+      title: "Archive | Jairus' Blog",
+      description: "Browse every post on Jairus' blog.",
       image: absoluteUrl(defaultSocialImage),
       url: `${siteUrl}/posts/`,
-      type: 'website',
+      type: "website",
     }),
-  }
+  },
 );
 fs.writeFileSync(archivePath, archive);
 
-const config = fs.readFileSync(configPath, 'utf8');
+const config = fs.readFileSync(configPath, "utf8");
 const sidebarItems = posts
-  .map((post) => `            { text: ${JSON.stringify(post.title)}, link: "/posts/${post.slug}" },`)
-  .join('\n');
+  .map(
+    (post) =>
+      `            { text: ${JSON.stringify(post.title)}, link: "/posts/${post.slug}" },`,
+  )
+  .join("\n");
 const postsSidebarStart = config.indexOf('"/posts/": [');
 let nextConfig = config;
 if (postsSidebarStart !== -1) {
-  const itemsStart = config.indexOf('items: [', postsSidebarStart);
-  const itemsEnd = config.indexOf('\n          ],', itemsStart);
+  const itemsStart = config.indexOf("items: [", postsSidebarStart);
+  const itemsEnd = config.indexOf("\n          ],", itemsStart);
   if (itemsStart !== -1 && itemsEnd !== -1) {
-    const before = config.slice(0, itemsStart + 'items: ['.length);
+    const before = config.slice(0, itemsStart + "items: [".length);
     const after = config.slice(itemsEnd);
     nextConfig = `${before}\n            { text: "Archive", link: "/posts/" },\n${sidebarItems}${after}`;
   }
 }
-nextConfig = nextConfig.replace(/giscus: \{([\s\S]*?)loading: "lazy",\n\s*tagColors:/, 'giscus: {$1loading: "lazy",\n    },\n    tagColors:');
+nextConfig = nextConfig.replace(
+  /giscus: \{([\s\S]*?)loading: "lazy",\n\s*tagColors:/,
+  'giscus: {$1loading: "lazy",\n    },\n    tagColors:',
+);
 fs.writeFileSync(configPath, nextConfig);
 
 const latest = posts[0];
@@ -674,30 +724,40 @@ if (latest) {
   updateMarkdownFile(homePath, ({ data, content }) => ({
     data: {
       ...data,
-      description: data.description || 'Build notes, release notes, and opinions with receipts.',
+      description:
+        data.description ||
+        "Build notes, release notes, and opinions with receipts.",
       head: buildHead({
         title: `${data.hero?.name || "Jairus' Blog"}`,
-        description: data.description || 'Build notes, release notes, and opinions with receipts.',
+        description:
+          data.description ||
+          "Build notes, release notes, and opinions with receipts.",
         image: absoluteUrl(defaultSocialImage),
         url: `${siteUrl}/`,
-        type: 'website',
+        type: "website",
       }),
     },
-    content: content.replace(/link: \/posts\/[A-Za-z0-9-]+/, `link: /posts/${latest.slug}`),
+    content: content.replace(
+      /link: \/posts\/[A-Za-z0-9-]+/,
+      `link: /posts/${latest.slug}`,
+    ),
   }));
 }
 
 updateMarkdownFile(aboutPath, ({ data, content }) => ({
   data: {
     ...data,
-    title: data.title || 'About',
-    description: data.description || 'About Jairus Tanaka and the work behind this blog.',
+    title: data.title || "About",
+    description:
+      data.description || "About Jairus Tanaka and the work behind this blog.",
     head: buildHead({
-      title: 'About | Jairus\' Blog',
-      description: data.description || 'About Jairus Tanaka and the work behind this blog.',
+      title: "About | Jairus' Blog",
+      description:
+        data.description ||
+        "About Jairus Tanaka and the work behind this blog.",
       image: absoluteUrl(defaultSocialImage),
       url: `${siteUrl}/about`,
-      type: 'website',
+      type: "website",
     }),
   },
   content,

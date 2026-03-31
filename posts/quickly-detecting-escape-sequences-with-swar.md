@@ -11,7 +11,7 @@ tags:
 createdAt: '2026-03-30'
 updatedAt: '2026-03-30'
 banner: /images/quickly-detecting-escape-sequences-with-swar.png
-socialImage: /social/quickly-detecting-escape-sequences-with-swar2.png
+socialImage: /social/quickly-detecting-escape-sequences-with-swar.png
 head:
   - - meta
     - property: 'og:title'
