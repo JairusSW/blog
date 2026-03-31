@@ -12,6 +12,7 @@ const githubRepoName = "blog";
 const postsDir = path.join(root, "posts");
 const tagsDir = path.join(root, "tags");
 const socialDir = path.join(root, "public", "social");
+const socialFontDir = path.join(root, ".vitepress", "theme", "fonts");
 const dataPath = path.join(root, ".vitepress", "theme", "posts.data.json");
 const tagsDataPath = path.join(root, ".vitepress", "theme", "tags.data.json");
 const configPath = path.join(root, ".vitepress", "config.mts");
@@ -35,6 +36,7 @@ function readTagColorOverrides() {
 const tagColorOverrides = readTagColorOverrides();
 
 fs.mkdirSync(socialDir, { recursive: true });
+fs.mkdirSync(socialFontDir, { recursive: true });
 
 function slugToTitle(slug) {
   return slug
@@ -288,13 +290,13 @@ function getImageDataUri(input) {
 function renderTagPills(tags, baseHue, startX, y) {
   let offsetX = startX;
   return tags.slice(0, 4).map((tag, index) => {
-    const width = Math.max(96, 34 + tag.length * 14);
+    const width = Math.max(112, 40 + tag.length * 13);
     const x = offsetX;
     offsetX += width + 14;
     const palette = resolveTagPalette(tag, index, baseHue);
     return `
-      <rect x="${x}" y="${y}" width="${width}" height="42" rx="21" fill="${palette.background}" stroke="${palette.border}"/>
-      <text x="${x + 18}" y="${y + 28}" fill="${palette.text}" font-size="22" font-family="SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace" font-weight="700">${escapeXml(tag)}</text>
+      <rect x="${x}" y="${y}" width="${width}" height="44" rx="22" fill="${palette.background}" stroke="${palette.border}"/>
+      <text x="${x + width / 2}" y="${y + 24}" fill="${palette.text}" font-size="20" font-family="League Spartan" font-weight="600" text-anchor="middle" dominant-baseline="middle">${escapeXml(tag)}</text>
     `;
   }).join("");
 }
@@ -305,7 +307,6 @@ function formatCountLabel(count, noun) {
 
 function renderCard({
   title,
-  description,
   tags = [],
   eyebrow = "Jairus' Blog",
   banner = "",
@@ -314,59 +315,100 @@ function renderCard({
   reactionCount = 0,
   commentCount = 0,
 }, outputName) {
-  const hue = colorFromString(`${title}${category}${description}`);
+  const hue = colorFromString(`${title}${category}${eyebrow}`);
   const titleLines = wrapLines(title, 24).slice(0, 3);
-  const descLines = wrapLines(description, 54).slice(0, 3);
   const bannerImage = getImageDataUri(banner);
-  const cardX = 0;
-  const cardY = 0;
   const cardWidth = 1200;
   const cardHeight = 630;
-  const bannerHeight = 252;
-  const bodyX = cardX + 44;
-  const bodyY = cardY + bannerHeight + 38;
   const meta = [date, category].filter(Boolean).join(" · ");
-  const descriptionStartY = bodyY + 68 + titleLines.length * 62;
-  const tagsY = cardY + cardHeight - 76;
-  const tagsSvg = renderTagPills(tags, hue, bodyX, tagsY);
-  const statsLabel = `${formatCountLabel(reactionCount, "reaction")}   ${formatCountLabel(commentCount, "comment")}`;
+  const metaLabel = meta || eyebrow;
+  const statsLabel = reactionCount || commentCount
+    ? `${formatCountLabel(reactionCount, "reaction")}   ${formatCountLabel(commentCount, "comment")}`
+    : "";
+  const framePad = 0;
+  const bodyX = 52;
+  const bannerX = framePad;
+  const bannerY = framePad;
+  const bannerWidth = cardWidth - framePad * 2;
+  const bannerHeight = 350;
+  const metaY = bannerY + bannerHeight + 52;
+  const titleY = metaY + 72;
+  const titleLineHeight = 68;
+  const footerY = cardHeight - 60;
+  const tagsSvg = renderTagPills(tags, hue, bodyX, footerY);
 
   const svg = `
   <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
+      <linearGradient id="card-bg" x1="0" y1="0" x2="1" y2="1">
+        <stop stop-color="#07111a"/>
+        <stop offset="0.62" stop-color="#0d1726"/>
+        <stop offset="1" stop-color="#121c2b"/>
+      </linearGradient>
+      <linearGradient id="accent-wash" x1="0" y1="0" x2="1" y2="1">
+        <stop stop-color="hsla(${hue}, 78%, 56%, 0.18)"/>
+        <stop offset="1" stop-color="hsla(${(hue + 52) % 360}, 72%, 54%, 0.06)"/>
+      </linearGradient>
       <linearGradient id="banner-fallback" x1="0" y1="0" x2="1" y2="1">
-        <stop stop-color="hsla(${hue}, 70%, 26%, 0.9)"/>
-        <stop offset="1" stop-color="#172033"/>
+        <stop stop-color="hsla(${hue}, 70%, 28%, 0.96)"/>
+        <stop offset="1" stop-color="#1b2940"/>
       </linearGradient>
       <linearGradient id="banner-overlay" x1="0" y1="0" x2="0" y2="1">
-        <stop stop-color="rgba(15,23,32,0.03)"/>
-        <stop offset="1" stop-color="rgba(15,23,32,0.18)"/>
+        <stop stop-color="rgba(7,17,26,0.04)"/>
+        <stop offset="1" stop-color="rgba(7,17,26,0.34)"/>
       </linearGradient>
-      <clipPath id="card-clip">
-        <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24"/>
-      </clipPath>
+      <linearGradient id="bottom-fade" x1="0" y1="0" x2="0" y2="1">
+        <stop stop-color="rgba(8,15,24,0)"/>
+        <stop offset="1" stop-color="rgba(8,15,24,0.5)"/>
+      </linearGradient>
+      <pattern id="blueprint-grid" x="0" y="0" width="48" height="48" patternUnits="userSpaceOnUse">
+        <path d="M48 0H0V48" fill="none" stroke="rgba(147,197,253,0.08)" stroke-width="1"/>
+        <circle cx="0" cy="0" r="1.4" fill="rgba(125,211,252,0.18)"/>
+      </pattern>
+      <pattern id="blueprint-grid-fine" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+        <path d="M16 0H0V16" fill="none" stroke="rgba(148,163,184,0.045)" stroke-width="1"/>
+      </pattern>
       <clipPath id="banner-clip">
-        <path d="M${cardX + 24} ${cardY}H${cardX + cardWidth - 24}C${cardX + cardWidth - 10.745} ${cardY} ${cardX + cardWidth} ${cardY + 10.745} ${cardX + cardWidth} ${cardY + 24}V${cardY + bannerHeight}H${cardX}V${cardY + 24}C${cardX} ${cardY + 10.745} ${cardX + 10.745} ${cardY} ${cardX + 24} ${cardY}Z"/>
+        <path d="M${bannerX + 26} ${bannerY}H${bannerX + bannerWidth - 26}C${bannerX + bannerWidth - 11.64} ${bannerY} ${bannerX + bannerWidth} ${bannerY + 11.64} ${bannerX + bannerWidth} ${bannerY + 26}V${bannerY + bannerHeight}H${bannerX}V${bannerY + 26}C${bannerX} ${bannerY + 11.64} ${bannerX + 11.64} ${bannerY} ${bannerX + 26} ${bannerY}Z"/>
       </clipPath>
     </defs>
-    <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${cardHeight}" rx="24" fill="#0f1720" stroke="rgba(148,163,184,0.18)"/>
+    <rect x="0" y="0" width="${cardWidth}" height="${cardHeight}" rx="28" fill="url(#card-bg)"/>
+    <rect x="${framePad}" y="${framePad}" width="${cardWidth - framePad * 2}" height="${cardHeight - framePad * 2}" rx="28" fill="rgba(9,15,24,0.7)" stroke="rgba(148,163,184,0.16)"/>
+    <circle cx="196" cy="112" r="190" fill="url(#accent-wash)"/>
+    <circle cx="962" cy="56" r="220" fill="hsla(${(hue + 34) % 360}, 80%, 54%, 0.08)"/>
+    <circle cx="1028" cy="620" r="196" fill="hsla(${(hue + 12) % 360}, 80%, 54%, 0.07)"/>
+    <rect x="0" y="${bannerHeight}" width="${cardWidth}" height="${cardHeight - bannerHeight}" fill="url(#blueprint-grid-fine)"/>
+    <rect x="0" y="${bannerHeight}" width="${cardWidth}" height="${cardHeight - bannerHeight}" fill="url(#blueprint-grid)"/>
+    <path d="M0 ${bannerHeight + 42}H264L304 ${bannerHeight + 86}H612L654 ${bannerHeight + 132}H1200" fill="none" stroke="rgba(125,211,252,0.13)" stroke-width="2"/>
+    <path d="M0 ${bannerHeight + 130}H176L222 ${bannerHeight + 178}H430L482 ${bannerHeight + 226}H902L960 ${bannerHeight + 264}H1200" fill="none" stroke="rgba(147,197,253,0.09)" stroke-width="2"/>
+    <circle cx="1038" cy="${bannerHeight + 108}" r="74" fill="none" stroke="rgba(125,211,252,0.08)" stroke-width="2"/>
+    <circle cx="1038" cy="${bannerHeight + 108}" r="46" fill="none" stroke="rgba(125,211,252,0.08)" stroke-width="1.5"/>
+    <path d="M996 ${bannerHeight + 108}H1080M1038 ${bannerHeight + 66}V${bannerHeight + 150}" fill="none" stroke="rgba(125,211,252,0.08)" stroke-width="1.5"/>
+    <rect x="0" y="${bannerHeight}" width="${cardWidth}" height="${cardHeight - bannerHeight}" fill="url(#bottom-fade)"/>
+    <text x="${bodyX}" y="${metaY}" fill="#93C5FD" font-size="22" font-family="League Spartan" font-weight="600" letter-spacing="0.6">${escapeXml(metaLabel)}</text>
+    ${titleLines.map((line, index) => `<text x="${bodyX}" y="${titleY + index * titleLineHeight}" fill="#F8FAFC" font-size="62" font-family="League Spartan" font-weight="700">${escapeXml(line)}</text>`).join("")}
+    <rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" rx="26" fill="rgba(15,23,42,0.44)" stroke="rgba(148,163,184,0.14)"/>
       <g clip-path="url(#banner-clip)">
         ${bannerImage
-          ? `<image href="${bannerImage}" x="${cardX}" y="${cardY}" width="${cardWidth}" height="${bannerHeight}" preserveAspectRatio="xMidYMid slice"/>`
-          : `<rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${bannerHeight}" fill="url(#banner-fallback)"/>`
+          ? `<image href="${bannerImage}" x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" preserveAspectRatio="xMidYMid slice"/>`
+          : `<rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" fill="url(#banner-fallback)"/>`
         }
-        <rect x="${cardX}" y="${cardY}" width="${cardWidth}" height="${bannerHeight}" fill="url(#banner-overlay)"/>
+        <rect x="${bannerX}" y="${bannerY}" width="${bannerWidth}" height="${bannerHeight}" fill="url(#banner-overlay)"/>
       </g>
-      <line x1="${cardX}" x2="${cardX + cardWidth}" y1="${cardY + bannerHeight}" y2="${cardY + bannerHeight}" stroke="rgba(148,163,184,0.14)"/>
-      <text x="${bodyX}" y="${bodyY}" fill="#94a3b8" font-size="20" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="0.8">${escapeXml(meta || eyebrow)}</text>
-      ${titleLines.map((line, index) => `<text x="${bodyX}" y="${bodyY + 54 + index * 62}" fill="#f8fafc" font-size="54" font-family="Arial, Helvetica, sans-serif" font-weight="800">${escapeXml(line)}</text>`).join("")}
-      ${descLines.map((line, index) => `<text x="${bodyX}" y="${descriptionStartY + index * 34}" fill="#cbd5e1" font-size="28" font-family="Arial, Helvetica, sans-serif" font-weight="500">${escapeXml(line)}</text>`).join("")}
       ${tagsSvg}
-      <text x="${cardWidth - 320}" y="${tagsY + 28}" fill="#94a3b8" font-size="22" font-family="Arial, Helvetica, sans-serif" font-weight="700">${escapeXml(statsLabel)}</text>
+      ${statsLabel
+        ? `<text x="${bodyX}" y="${footerY - 28}" fill="#94A3B8" font-size="24" font-family="League Spartan" font-weight="500">${escapeXml(statsLabel)}</text>`
+        : ""
+      }
   </svg>`;
 
   const resvg = new Resvg(svg, {
     fitTo: { mode: "width", value: 1200 },
+    font: {
+      fontFiles: [path.join(socialFontDir, "LeagueSpartan-SemiBold.otf")],
+      loadSystemFonts: false,
+      defaultFontFamily: "League Spartan",
+    },
   });
   const png = resvg.render().asPng();
   fs.writeFileSync(path.join(socialDir, outputName), png);
@@ -446,7 +488,6 @@ try {
 renderCard(
   {
     title: "Jairus' Blog",
-    description: "Build notes, release notes, and opinions with receipts.",
     tags: ["assemblyscript", "tooling", "performance"],
     eyebrow: "Jairus' Blog",
   },
@@ -457,7 +498,6 @@ for (const post of posts) {
   renderCard(
     {
       title: post.title,
-      description: post.description,
       tags: post.tags,
       eyebrow: post.category || "Post",
       banner: post.banner,
