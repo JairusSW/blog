@@ -228,24 +228,27 @@ If your strings are mostly ASCII, that is often a good deal.
 Once you have the mask, the fast path becomes tiny:
 
 ```ts
-let block = load<u64>(srcStart);
-store<u64>(bs.offset, block);
-
-let mask = detect_escapable_u64_swar_unsafe(block);
-
-while (mask != 0) {
-  const laneIdx = ctz(mask) >> 3;
-  // clear low and high bytes
-  mask &= ~(0xffff << (laneIdx << 3));
-  // even (0 2 4 6) -> confirmed ascii escape
-  // odd (1 3 5 7) -> possibly a unicode code unit or surrogate
-
-  if ((laneIdx & 1) === 0) {
-    // handle non-surrogates (fast path)
-    break;
+while (true) {
+  const block = load<u64>(srcStart);
+  
+  let mask = detect_escapable_u64_swar_unsafe(block);
+  
+  while (mask != 0) {
+    const laneIdx = ctz(mask) >> 3;
+    // clear low and high bytes
+    mask &= ~(0xffff << (laneIdx << 3));
+    // even (0 2 4 6) -> confirmed ascii escape
+    // odd (1 3 5 7) -> possibly a unicode code unit or surrogate
+  
+    if ((laneIdx & 1) === 0) {
+      // handle non-surrogates (fast path)
+      continue;
+    }
+    
+    // and handle surrogates here (unlikely to be hit)
   }
   
-  // and handle surrogates here (unlikely to be hit)
+  offset += 8;
 }
 ```
 
