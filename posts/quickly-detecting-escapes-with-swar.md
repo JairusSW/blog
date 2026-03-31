@@ -296,8 +296,9 @@ If you want to rerun it, the example folder is here:
 And the commands are just:
 
 ```bash
-make run-wasm
-make run-c
+make install
+make build
+make run
 ```
 
 ## Looking at the generated code
