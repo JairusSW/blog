@@ -35,10 +35,6 @@
   color: var(--vp-c-text-2);
 }
 
-.post-header-stats {
-  margin-top: 0.7rem;
-}
-
 
 .post-collection {
   margin: 2rem 0;
@@ -159,10 +155,6 @@
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--vp-c-text-3);
-}
-
-.view-count {
-  display: inline-flex;
 }
 
 .post-stats-loader {
