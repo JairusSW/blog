@@ -50,8 +50,6 @@ head:
 id: 4
 ---
 
-# Quickly detecting Escape Sequences with SWAR
-
 Most JSON string data is boring.
 
 It is just ASCII text that does not contain `"` or `\`, does not dip below `0x20`, and does not force any special-case escaping at all.
