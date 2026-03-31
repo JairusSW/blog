@@ -1,9 +1,9 @@
 [
   {
-    "fullPath": "/home/port/Code/blog/posts/quickly-detecting-escape-sequences-with-swar.md",
-    "slug": "quickly-detecting-escape-sequences-with-swar",
+    "fullPath": "/home/port/Code/blog/posts/quickly-detecting-escapes-with-swar.md",
+    "slug": "quickly-detecting-escapes-with-swar",
     "id": 4,
-    "title": "Quickly detecting Escape Sequences with SWAR",
+    "title": "Quickly detecting Escapes with SWAR",
     "description": "A compact SWAR trick for detecting quotes, backslashes, control characters, and non-ASCII UTF-16 lanes while serializing JSON strings.",
     "createdAt": "March 30, 2026",
     "createdAtRaw": "2026-03-30",
@@ -12,14 +12,10 @@
     "updatedAtRaw": "2026-03-30",
     "updatedAtSort": 1774872000000,
     "category": "Performance",
-    "banner": "/images/quickly-detecting-escape-sequences-with-swar.png",
+    "banner": "/images/quickly-detecting-escapes-with-swar.png",
     "bannerAlt": "",
-    "socialImage": "/social/quickly-detecting-escape-sequences-with-swar.png",
-    "tags": [
-      "performance",
-      "swar",
-      "assemblyscript"
-    ],
+    "socialImage": "/social/quickly-detecting-escapes-with-swar.png",
+    "tags": ["performance", "swar", "assemblyscript"],
     "commentCount": 0,
     "reactionCount": 0
   },
@@ -39,12 +35,7 @@
     "banner": "/images/testing-in-assemblyscript-banner.png",
     "bannerAlt": "Evergreen trees banner",
     "socialImage": "/social/testing-in-assemblyscript.png",
-    "tags": [
-      "testing",
-      "assemblyscript",
-      "webassembly",
-      "performance"
-    ],
+    "tags": ["testing", "assemblyscript", "webassembly", "performance"],
     "commentCount": 0,
     "reactionCount": 0
   },
@@ -64,11 +55,7 @@
     "banner": "/images/unicode-escapes-swar-banner.jpg",
     "bannerAlt": "Abstract banner image for unicode parsing post",
     "socialImage": "/social/quickly-parsing-unicode-escapes-with-swar.png",
-    "tags": [
-      "performance",
-      "swar",
-      "assemblyscript"
-    ],
+    "tags": ["performance", "swar", "assemblyscript"],
     "commentCount": 0,
     "reactionCount": 0
   },
@@ -88,12 +75,7 @@
     "banner": "/images/fuzzing-in-assemblyscript-banner-v2.png",
     "bannerAlt": "Abstract banner image for fuzzing in AssemblyScript",
     "socialImage": "/social/fuzzing-in-assemblyscript.png",
-    "tags": [
-      "testing",
-      "fuzzing",
-      "assemblyscript",
-      "webassembly"
-    ],
+    "tags": ["testing", "fuzzing", "assemblyscript", "webassembly"],
     "commentCount": 0,
     "reactionCount": 0
   }

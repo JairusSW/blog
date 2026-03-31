@@ -1,5 +1,5 @@
 ---
-title: Quickly detecting Escape Sequences with SWAR
+title: Quickly detecting Escapes with SWAR
 description: >-
   A compact SWAR trick for detecting quotes, backslashes, control characters,
   and non-ASCII UTF-16 lanes while serializing JSON strings.
@@ -10,12 +10,12 @@ tags:
   - assemblyscript
 createdAt: '2026-03-30'
 updatedAt: '2026-03-30'
-banner: /images/quickly-detecting-escape-sequences-with-swar.png
-socialImage: /social/quickly-detecting-escape-sequences-with-swar.png
+banner: /images/quickly-detecting-escapes-with-swar.png
+socialImage: /social/quickly-detecting-escapes-with-swar.png
 head:
   - - meta
     - property: 'og:title'
-      content: Quickly detecting Escape Sequences with SWAR
+      content: Quickly detecting Escapes with SWAR
   - - meta
     - property: 'og:description'
       content: >-
@@ -24,11 +24,11 @@ head:
   - - meta
     - property: 'og:image'
       content: >-
-        https://blog.jairus.dev/social/quickly-detecting-escape-sequences-with-swar.png
+        https://blog.jairus.dev/social/quickly-detecting-escapes-with-swar.png
   - - meta
     - property: 'og:url'
       content: >-
-        https://blog.jairus.dev/posts/quickly-detecting-escape-sequences-with-swar
+        https://blog.jairus.dev/posts/quickly-detecting-escapes-with-swar
   - - meta
     - property: 'og:type'
       content: article
@@ -37,7 +37,7 @@ head:
       content: summary_large_image
   - - meta
     - name: 'twitter:title'
-      content: Quickly detecting Escape Sequences with SWAR
+      content: Quickly detecting Escapes with SWAR
   - - meta
     - name: 'twitter:description'
       content: >-
@@ -46,7 +46,7 @@ head:
   - - meta
     - name: 'twitter:image'
       content: >-
-        https://blog.jairus.dev/social/quickly-detecting-escape-sequences-with-swar.png
+        https://blog.jairus.dev/social/quickly-detecting-escapes-with-swar.png
 id: 4
 ---
 
@@ -77,9 +77,9 @@ That is where [SWAR](https://en.wikipedia.org/wiki/SWAR) fits nicely.
 
 For this post, the companion code is here:
 
-- [`00-detector-functions`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escape-sequences-with-swar/00-detector-functions)
-- [`01-c-and-wasm-benchmark`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escape-sequences-with-swar/01-c-and-wasm-benchmark)
-- [`02-assemblyscript-inspection`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escape-sequences-with-swar/02-assemblyscript-inspection)
+- [`00-detector-functions`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escapes-with-swar/00-detector-functions)
+- [`01-c-and-wasm-benchmark`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escapes-with-swar/01-c-and-wasm-benchmark)
+- [`02-assemblyscript-inspection`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escapes-with-swar/02-assemblyscript-inspection)
 
 ## What needs detecting?
 
@@ -266,9 +266,9 @@ I reran the detector-only benchmark with matching harness shapes in both impleme
 
 Both versions use the same payload size, warmup policy, operation count, and logging structure. The benchmark code is here:
 
-- [`wasm-bench.ts`](https://github.com/JairusSW/blog/blob/main/code/quickly-detecting-escape-sequences-with-swar/01-c-and-wasm-benchmark/wasm-bench.ts)
-- [`bench.c`](https://github.com/JairusSW/blog/blob/main/code/quickly-detecting-escape-sequences-with-swar/01-c-and-wasm-benchmark/bench.c)
-- [`bench-lib.h`](https://github.com/JairusSW/blog/blob/main/code/quickly-detecting-escape-sequences-with-swar/01-c-and-wasm-benchmark/bench-lib.h)
+- [`wasm-bench.ts`](https://github.com/JairusSW/blog/blob/main/code/quickly-detecting-escapes-with-swar/01-c-and-wasm-benchmark/wasm-bench.ts)
+- [`bench.c`](https://github.com/JairusSW/blog/blob/main/code/quickly-detecting-escapes-with-swar/01-c-and-wasm-benchmark/bench.c)
+- [`bench-lib.h`](https://github.com/JairusSW/blog/blob/main/code/quickly-detecting-escapes-with-swar/01-c-and-wasm-benchmark/bench-lib.h)
 
 The two payload shapes are:
 
@@ -295,7 +295,7 @@ That is exactly what I wanted to know. The unsafe detector is not just theoretic
 
 If you want to rerun it, the example folder is here:
 
-- [`01-c-and-wasm-benchmark`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escape-sequences-with-swar/01-c-and-wasm-benchmark)
+- [`01-c-and-wasm-benchmark`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escapes-with-swar/01-c-and-wasm-benchmark)
 
 And the commands are just:
 
@@ -310,7 +310,7 @@ The throughput numbers tell you the tradeoff is real, but the code shape explain
 
 The unsafe detector compiles to a smaller body because it skips the extra high-byte proof/merge logic from the safe version. That is easiest to see in the inspection example:
 
-- [`02-assemblyscript-inspection`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escape-sequences-with-swar/02-assemblyscript-inspection)
+- [`02-assemblyscript-inspection`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escapes-with-swar/02-assemblyscript-inspection)
 
 There is nothing magical there. The unsafe version is just doing less work.
 

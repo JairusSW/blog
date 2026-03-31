@@ -74,10 +74,22 @@ export default defineConfig({
           text: "Posts",
           items: [
             { text: "Archive", link: "/posts/" },
-            { text: "Quickly detecting Escape Sequences with SWAR", link: "/posts/quickly-detecting-escape-sequences-with-swar" },
-            { text: "Testing in AssemblyScript", link: "/posts/testing-in-assemblyscript" },
-            { text: "Quickly parsing Unicode Escapes with SWAR", link: "/posts/quickly-parsing-unicode-escapes-with-swar" },
-            { text: "Fuzzing in AssemblyScript", link: "/posts/fuzzing-in-assemblyscript" },
+            {
+              text: "Quickly detecting Escapes with SWAR",
+              link: "/posts/quickly-detecting-escapes-with-swar",
+            },
+            {
+              text: "Testing in AssemblyScript",
+              link: "/posts/testing-in-assemblyscript",
+            },
+            {
+              text: "Quickly parsing Unicode Escapes with SWAR",
+              link: "/posts/quickly-parsing-unicode-escapes-with-swar",
+            },
+            {
+              text: "Fuzzing in AssemblyScript",
+              link: "/posts/fuzzing-in-assemblyscript",
+            },
           ],
         },
       ],
