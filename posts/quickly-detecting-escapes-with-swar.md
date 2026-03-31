@@ -287,14 +287,7 @@ Here are the current numbers from that harness:
 | safe / escaped | 4908 MB/s | 6295 MB/s |
 | unsafe / escaped | 7093 MB/s | 8331 MB/s |
 
-The shape is the important part:
-
-- the unsafe detector wins in both environments
-- native C is still faster overall on this machine
-- Wasm is close enough that the same design decision still matters
-- tuning the Wasmer runner mattered more here than trying to force extra post-link optimization passes onto the module
-
-That is exactly what I wanted to know. The unsafe detector is not just theoretically smaller. It buys measurable throughput in the actual runtime I care about.
+That is exactly what I wanted to know. The unsafe detector is not just theoretically smaller. It buys measurable throughput in the actual runtime I care about. When integrating it into an actual JSON serializer, it's marginally faster too.
 
 If you want to rerun it, the example folder is here:
 
