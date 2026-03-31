@@ -231,12 +231,21 @@ Once you have the mask, the fast path becomes tiny:
 let block = load<u64>(srcStart);
 store<u64>(bs.offset, block);
 
-let mask = detect_escapable_u64_swar_safe(block);
+let mask = detect_escapable_u64_swar_unsafe(block);
 
-if (mask === 0) {
-  srcStart += 8;
-  bs.offset += 8;
-  continue;
+while (mask != 0) {
+  const laneIdx = ctz(mask) >> 3;
+  // clear low and high bytes
+  mask &= ~(0xffff << (laneIdx << 3));
+  // even (0 2 4 6) -> confirmed ascii escape
+  // odd (1 3 5 7) -> possibly a unicode code unit or surrogate
+
+  if ((laneIdx & 1) === 0) {
+    // handle non-surrogates (fast path)
+    break;
+  }
+  
+  // and handle surrogates here (unlikely to be hit)
 }
 ```
 
@@ -304,8 +313,6 @@ The unsafe detector compiles to a smaller body because it skips the extra high-b
 - [`02-assemblyscript-inspection`](https://github.com/JairusSW/blog/tree/main/code/quickly-detecting-escape-sequences-with-swar/02-assemblyscript-inspection)
 
 There is nothing magical there. The unsafe version is just doing less work.
-
-That is why I like this optimization. It is not a “benchmark trick” in the bad sense. The source is smaller, the emitted code is smaller, and the measured throughput moves in the same direction.
 
 If you want to see the real implementation in context, these are the relevant `json-as` sources:
 
