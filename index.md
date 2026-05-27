@@ -8,7 +8,7 @@ hero:
   actions:
     - theme: brand
       text: Read the latest
-      link: /posts/testing-in-assemblyscript
+      link: /posts/as-test-1-1-0
     - theme: alt
       text: Browse archive
       link: /posts/

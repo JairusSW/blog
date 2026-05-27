@@ -23,12 +23,10 @@ head:
         characters, and non-ASCII UTF-16 lanes while serializing JSON strings.
   - - meta
     - property: 'og:image'
-      content: >-
-        https://blog.jairus.dev/social/quickly-detecting-escapes-with-swar.png
+      content: 'https://blog.jairus.dev/social/quickly-detecting-escapes-with-swar.png'
   - - meta
     - property: 'og:url'
-      content: >-
-        https://blog.jairus.dev/posts/quickly-detecting-escapes-with-swar
+      content: 'https://blog.jairus.dev/posts/quickly-detecting-escapes-with-swar'
   - - meta
     - property: 'og:type'
       content: article
@@ -45,8 +43,7 @@ head:
         characters, and non-ASCII UTF-16 lanes while serializing JSON strings.
   - - meta
     - name: 'twitter:image'
-      content: >-
-        https://blog.jairus.dev/social/quickly-detecting-escapes-with-swar.png
+      content: 'https://blog.jairus.dev/social/quickly-detecting-escapes-with-swar.png'
 id: 4
 ---
 
