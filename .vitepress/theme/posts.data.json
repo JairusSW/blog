@@ -1,5 +1,29 @@
 [
   {
+    "fullPath": "/Users/jai/Code/Blog/posts/validating-utf8-at-gigabytes-per-second.md",
+    "slug": "validating-utf8-at-gigabytes-per-second",
+    "id": 5,
+    "title": "Validating UTF-8 at Gigabytes per Second",
+    "description": "Porting simdutf's lookup-table UTF-8 validator to 128-bit WebAssembly SIMD, plus an ASCII fast path that pushes mostly-ASCII text past 58 GB/s.",
+    "createdAt": "June 1, 2026",
+    "createdAtRaw": "2026-06-01",
+    "createdAtSort": 1780315200000,
+    "updatedAt": "June 1, 2026",
+    "updatedAtRaw": "2026-06-01",
+    "updatedAtSort": 1780315200000,
+    "category": "Performance",
+    "banner": "",
+    "bannerAlt": "",
+    "socialImage": "/social/validating-utf8-at-gigabytes-per-second.png",
+    "tags": [
+      "performance",
+      "assemblyscript",
+      "webassembly"
+    ],
+    "commentCount": 0,
+    "reactionCount": 0
+  },
+  {
     "fullPath": "/Users/jai/Code/Blog/posts/quickly-detecting-escapes-with-swar.md",
     "slug": "quickly-detecting-escapes-with-swar",
     "id": 4,

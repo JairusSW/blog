@@ -74,6 +74,7 @@ export default defineConfig({
           text: "Posts",
           items: [
             { text: "Archive", link: "/posts/" },
+            { text: "Validating UTF-8 at Gigabytes per Second", link: "/posts/validating-utf8-at-gigabytes-per-second" },
             { text: "Quickly detecting Escapes with SWAR", link: "/posts/quickly-detecting-escapes-with-swar" },
             { text: "Testing in AssemblyScript", link: "/posts/testing-in-assemblyscript" },
             { text: "Quickly parsing Unicode Escapes with SWAR", link: "/posts/quickly-parsing-unicode-escapes-with-swar" },
