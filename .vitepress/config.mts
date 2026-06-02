@@ -8,7 +8,19 @@ export default defineConfig({
   appearance: "dark",
   base: "/",
   cleanUrls: true,
+  lastUpdated: true,
+  sitemap: {
+    hostname: "https://blog.jairus.dev",
+  },
   head: [["link", { rel: "icon", type: "image/png", href: "/logo.png" }]],
+  transformHead({ pageData }) {
+    const canonical =
+      "https://blog.jairus.dev/" +
+      pageData.relativePath
+        .replace(/(^|\/)index\.md$/, "$1")
+        .replace(/\.md$/, "");
+    return [["link", { rel: "canonical", href: canonical }]];
+  },
   themeConfig: {
     logo: "/logo.png",
     nav: [
