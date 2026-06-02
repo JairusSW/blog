@@ -1,3 +1,9 @@
+/* Archive: drop the TOC aside and let content fill, so the right gap
+   matches the ~32px gap between the sidebar and the content. */
+.archive-page .VPDoc .content-container {
+  max-width: none;
+}
+
 .post-banner {
   margin: 0 0 1.5rem;
 }

@@ -1,6 +1,8 @@
 ---
 title: Archive
 description: Browse every post on Jairus' blog.
+aside: false
+pageClass: archive-page
 head:
   - - meta
     - property: 'og:title'
@@ -30,4 +32,4 @@ head:
     - name: 'twitter:image'
       content: 'https://blog.jairus.dev/logo.png'
 ---
-<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, and `npm run posts:sync` will assign the next `id`, preserve `createdAt`, and set missing `updatedAt` metadata." />
+<PostCards title="All Posts" intro="Every post in one place." />

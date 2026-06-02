@@ -675,10 +675,12 @@ for (const tag of tags) {
 }
 
 const archive = matter.stringify(
-  '<PostCards title="All Posts" intro="Every post in one place. Add a new markdown file under `posts/`, and `npm run posts:sync` will assign the next `id`, preserve `createdAt`, and set missing `updatedAt` metadata." />\n',
+  '<PostCards title="All Posts" intro="Every post in one place." />\n',
   {
     title: "Archive",
     description: "Browse every post on Jairus' blog.",
+    aside: false,
+    pageClass: "archive-page",
     head: buildHead({
       title: "Archive | Jairus' Blog",
       description: "Browse every post on Jairus' blog.",
