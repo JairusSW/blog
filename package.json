@@ -8,9 +8,11 @@
     "blog:preview": "vitepress preview .",
     "posts:sync": "node scripts/sync-posts.mjs",
     "social:check": "node scripts/check-social.mjs",
-    "images:compress": "bash scripts/compress-images.sh"
+    "images:compress": "bash scripts/compress-images.sh",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
     "vitepress": "^1.6.4"
   },
   "dependencies": {

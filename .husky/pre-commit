@@ -1,0 +1,16 @@
+# Regenerate the committed blog-sync outputs when a post, the sync script, or
+# the config changes, so the repo never drifts from what CI deploys.
+# (The sitemap itself is build-time only and handled by CI — not here.)
+changed=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if echo "$changed" | grep -Eq '^(posts/.*\.md|scripts/sync-posts\.mjs|\.vitepress/config\.mts)$'; then
+  echo "↻ posts:sync (post/config change detected)"
+  npm run posts:sync || exit 1
+  git add \
+    .vitepress/theme/posts.data.json \
+    .vitepress/theme/tags.data.json \
+    .vitepress/config.mts \
+    posts/index.md \
+    tags \
+    public/social
+fi
