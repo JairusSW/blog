@@ -13,7 +13,8 @@
   },
   "devDependencies": {
     "husky": "^9.1.7",
-    "vitepress": "^1.6.4"
+    "vitepress": "^1.6.4",
+    "wrangler": "^4.113.0"
   },
   "dependencies": {
     "@resvg/resvg-js": "^2.6.2",

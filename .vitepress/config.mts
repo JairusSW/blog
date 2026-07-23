@@ -8,9 +8,29 @@ export default defineConfig({
   appearance: "dark",
   base: "/",
   cleanUrls: true,
+  srcExclude: ["AUTHORING.md", "code/**/*.md"],
   lastUpdated: true,
   sitemap: {
     hostname: "https://blog.jairus.dev",
+    lastmodDateOnly: true,
+    transformItems(items) {
+      return items.map((item) => {
+        const pathname = new URL(
+          String(item.url),
+          "https://blog.jairus.dev",
+        ).pathname;
+        if (pathname === "/") {
+          return { ...item, changefreq: "weekly", priority: 1 };
+        }
+        if (pathname.startsWith("/posts/") && pathname !== "/posts/") {
+          return { ...item, changefreq: "monthly", priority: 0.8 };
+        }
+        if (pathname.startsWith("/tags/")) {
+          return { ...item, changefreq: "weekly", priority: 0.6 };
+        }
+        return { ...item, changefreq: "monthly", priority: 0.7 };
+      });
+    },
   },
   head: [["link", { rel: "icon", type: "image/png", href: "/logo.png" }]],
   transformHead({ pageData }) {
@@ -19,7 +39,53 @@ export default defineConfig({
       pageData.relativePath
         .replace(/(^|\/)index\.md$/, "$1")
         .replace(/\.md$/, "");
-    return [["link", { rel: "canonical", href: canonical }]];
+    const frontmatter = pageData.frontmatter;
+    const isPost = pageData.relativePath.startsWith("posts/") &&
+      pageData.relativePath !== "posts/index.md";
+    const socialImage = frontmatter.socialImage
+      ? `https://blog.jairus.dev${frontmatter.socialImage}`
+      : "https://blog.jairus.dev/logo.png";
+    const structuredData = isPost
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: frontmatter.title || pageData.title,
+          description: frontmatter.description,
+          image: socialImage,
+          datePublished: frontmatter.createdAt,
+          dateModified: frontmatter.updatedAt || frontmatter.createdAt,
+          mainEntityOfPage: canonical,
+          author: {
+            "@type": "Person",
+            name: "Jairus Tanaka",
+            url: "https://blog.jairus.dev/about",
+          },
+          publisher: {
+            "@type": "Person",
+            name: "Jairus Tanaka",
+            url: "https://blog.jairus.dev/",
+          },
+          keywords: Array.isArray(frontmatter.tags)
+            ? frontmatter.tags.join(", ")
+            : undefined,
+        }
+      : {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: frontmatter.title || pageData.title || "Jairus' Blog",
+          description: frontmatter.description,
+          url: canonical,
+          isPartOf: {
+            "@type": "Blog",
+            name: "Jairus' Blog",
+            url: "https://blog.jairus.dev/",
+          },
+        };
+    return [
+      ["link", { rel: "canonical", href: canonical }],
+      ["meta", { property: "og:site_name", content: "Jairus' Blog" }],
+      ["script", { type: "application/ld+json" }, JSON.stringify(structuredData)],
+    ];
   },
   themeConfig: {
     logo: "/logo.png",

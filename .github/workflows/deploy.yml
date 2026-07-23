@@ -41,6 +41,13 @@ jobs:
           GH_DISCUSSIONS_TOKEN: ${{ secrets.GH_DISCUSSIONS_TOKEN }}
         run: npm run blog:build
 
+      - name: Verify search metadata
+        run: |
+          test -s .vitepress/dist/sitemap.xml
+          grep -q '<lastmod>' .vitepress/dist/sitemap.xml
+          grep -q 'application/ld+json' .vitepress/dist/index.html
+          grep -q 'Sitemap: https://blog.jairus.dev/sitemap.xml' .vitepress/dist/robots.txt
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
