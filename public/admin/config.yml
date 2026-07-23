@@ -1,0 +1,55 @@
+backend:
+  name: github
+  repo: JairusSW/blog
+  branch: main
+  base_url: https://auth.jairus.dev
+  auth_endpoint: /auth
+  squash_merges: true
+
+site_url: https://blog.jairus.dev
+display_url: https://blog.jairus.dev
+logo_url: https://blog.jairus.dev/logo.png
+publish_mode: editorial_workflow
+show_preview_links: true
+
+media_folder: public/images
+public_folder: /images
+
+slug:
+  encoding: ascii
+  clean_accents: true
+  sanitize_replacement: "-"
+
+collections:
+  - name: posts
+    label: Posts
+    label_singular: Post
+    folder: posts
+    extension: md
+    format: frontmatter
+    create: true
+    delete: false
+    identifier_field: title
+    summary: "{{createdAt}} · {{title}}"
+    sortable_fields: [createdAt, updatedAt, title, category]
+    view_filters:
+      - label: Performance
+        field: category
+        pattern: Performance
+      - label: Testing
+        field: category
+        pattern: Testing
+    slug: "{{slug}}"
+    preview_path: "posts/{{slug}}"
+    fields:
+      - { label: ID, name: id, widget: hidden, required: false }
+      - { label: Title, name: title, widget: string, hint: "Keep it specific; this becomes the H1, browser title, and OG headline." }
+      - { label: Description, name: description, widget: text, pattern: ["^.{50,160}$", "Use 50–160 characters for a useful search snippet."], hint: "Shown in search results, social cards, and the archive." }
+      - { label: Published, name: createdAt, widget: date, format: YYYY-MM-DD, date_format: "MMM D, YYYY", time_format: false }
+      - { label: Updated, name: updatedAt, widget: date, format: YYYY-MM-DD, date_format: "MMM D, YYYY", time_format: false }
+      - { label: Category, name: category, widget: select, options: [Performance, Testing, Tooling, Software Design, WebAssembly, Post], default: Post }
+      - { label: Tags, name: tags, widget: list, allow_add: true, collapsed: false, field: { label: Tag, name: tag, widget: string }, hint: "Use lowercase topic names. Tag pages are generated automatically." }
+      - { label: Banner, name: banner, widget: image, required: false, choose_url: false }
+      - { label: Banner alt text, name: bannerAlt, widget: string, required: false, hint: "Describe the banner for readers who cannot see it." }
+      - { label: Generated social image, name: socialImage, widget: hidden, required: false }
+      - { label: Body, name: body, widget: markdown, modes: [rich_text, raw], minimal: false }

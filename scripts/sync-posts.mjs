@@ -541,7 +541,6 @@ const posts = postEntries
     const updatedAt = parseFrontmatterDate(updatedSource, "updatedAt", slug);
 
     return {
-      fullPath,
       slug,
       id,
       title,

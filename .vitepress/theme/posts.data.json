@@ -1,6 +1,5 @@
 [
   {
-    "fullPath": "/Users/jai/Code/Blog/posts/validating-utf8-at-gigabytes-per-second.md",
     "slug": "validating-utf8-at-gigabytes-per-second",
     "id": 5,
     "title": "Validating UTF-8 at Gigabytes per Second",
@@ -24,7 +23,6 @@
     "reactionCount": 0
   },
   {
-    "fullPath": "/Users/jai/Code/Blog/posts/quickly-detecting-escapes-with-swar.md",
     "slug": "quickly-detecting-escapes-with-swar",
     "id": 4,
     "title": "Quickly detecting Escapes with SWAR",
@@ -48,7 +46,6 @@
     "reactionCount": 0
   },
   {
-    "fullPath": "/Users/jai/Code/Blog/posts/testing-in-assemblyscript.md",
     "slug": "testing-in-assemblyscript",
     "id": 3,
     "title": "Testing in AssemblyScript",
@@ -73,7 +70,6 @@
     "reactionCount": 0
   },
   {
-    "fullPath": "/Users/jai/Code/Blog/posts/quickly-parsing-unicode-escapes-with-swar.md",
     "slug": "quickly-parsing-unicode-escapes-with-swar",
     "id": 2,
     "title": "Quickly parsing Unicode Escapes with SWAR",
@@ -97,7 +93,6 @@
     "reactionCount": 0
   },
   {
-    "fullPath": "/Users/jai/Code/Blog/posts/fuzzing-in-assemblyscript.md",
     "slug": "fuzzing-in-assemblyscript",
     "id": 1,
     "title": "Fuzzing in AssemblyScript",
