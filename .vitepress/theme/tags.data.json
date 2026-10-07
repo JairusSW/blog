@@ -12,7 +12,7 @@
   {
     "slug": "performance",
     "name": "performance",
-    "count": 4
+    "count": 5
   },
   {
     "slug": "swar",
@@ -27,6 +27,6 @@
   {
     "slug": "webassembly",
     "name": "webassembly",
-    "count": 3
+    "count": 4
   }
 ]

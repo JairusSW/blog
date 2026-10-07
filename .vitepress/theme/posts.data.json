@@ -1,5 +1,27 @@
 [
   {
+    "slug": "a-new-webassembly-runtime-enters-the-arena",
+    "id": 6,
+    "title": "A new WebAssembly runtime enters the arena... Is it worthy?",
+    "description": "Introducing Wago, a new Go WebAssembly runtime built for fast compilation, low memory usage, and full control over your runtime.",
+    "createdAt": "September 10, 2026",
+    "createdAtRaw": "2026-09-10",
+    "createdAtSort": 1789041600000,
+    "updatedAt": "September 10, 2026",
+    "updatedAtRaw": "2026-09-10",
+    "updatedAtSort": 1789041600000,
+    "category": "WebAssembly",
+    "banner": "/images/wago-banner.png",
+    "bannerAlt": "Wago — WebAssembly, made for Go.",
+    "socialImage": "/social/a-new-webassembly-runtime-enters-the-arena.png",
+    "tags": [
+      "webassembly",
+      "performance"
+    ],
+    "commentCount": 0,
+    "reactionCount": 0
+  },
+  {
     "slug": "validating-utf8-at-gigabytes-per-second",
     "id": 5,
     "title": "Validating UTF-8 at Gigabytes per Second",

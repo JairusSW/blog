@@ -146,6 +146,7 @@ export default defineConfig({
           text: "Posts",
           items: [
             { text: "Archive", link: "/posts/" },
+            { text: "A new WebAssembly runtime enters the arena... Is it worthy?", link: "/posts/a-new-webassembly-runtime-enters-the-arena" },
             { text: "Validating UTF-8 at Gigabytes per Second", link: "/posts/validating-utf8-at-gigabytes-per-second" },
             { text: "Quickly detecting Escapes with SWAR", link: "/posts/quickly-detecting-escapes-with-swar" },
             { text: "Testing in AssemblyScript", link: "/posts/testing-in-assemblyscript" },
